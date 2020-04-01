@@ -1,0 +1,36 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+
+namespace DDD.Core
+{
+    public class EventStore
+    {
+        private readonly Dictionary<string, List<LoadedEvent>> _streams = new Dictionary<string, List<LoadedEvent>>();
+
+        public void SaveEvents(string streamName, params LoadedEvent[] changes)
+        {
+            //Console.WriteLine($"=== Save ==={streamName}===");
+            //Console.WriteLine(JsonSerializer.Serialize(changes, new JsonSerializerOptions { WriteIndented = true }));
+
+            if (!_streams.TryGetValue(streamName, out var loadedEvents))
+            {
+                loadedEvents = new List<LoadedEvent>();
+                _streams.Add(streamName, loadedEvents);
+            }
+
+            loadedEvents.AddRange(changes);
+        }
+
+        public IEnumerable<LoadedEvent> GetStreamEvents(string streamName)
+        {
+            if (_streams.TryGetValue(streamName, out var loadedEvents))
+            {
+                return loadedEvents;
+            }
+
+            return Enumerable.Empty<LoadedEvent>();
+        }
+    }
+}
