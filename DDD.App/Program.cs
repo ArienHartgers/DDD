@@ -5,6 +5,10 @@ using DDD.Core.OrderManagement.Orders;
 using DDD.Core.OrderManagement.Orders.Commands;
 using DDD.Core.OrderManagement.Orders.Entities;
 using DDD.Core.OrderManagement.Orders.Identities;
+using DDD.Core.OrderManagement.Products.Commands;
+using DDD.Core.OrderManagement.Products.Entities;
+using DDD.Core.OrderManagement.Products.Identities;
+using DDD.Core.OrderManagement.Products.ValueObjects;
 
 namespace DDD.App
 {
@@ -13,23 +17,41 @@ namespace DDD.App
         static void Main()
         {
 
-            var e = new Core.OrderManagement.Orders.Events.OrderCreated(OrderIdentity.New());
-            System.Console.WriteLine(JsonSerializer.Serialize(e, new JsonSerializerOptions { WriteIndented = true }));
+            //var e = new Core.OrderManagement.Orders.Events.OrderCreated(OrderIdentity.New());
+            //System.Console.WriteLine(JsonSerializer.Serialize(e, new JsonSerializerOptions { WriteIndented = true }));
 
 
-            var a = EventMapping.Convert(e);
-            var json = JsonSerializer.Serialize(a, new JsonSerializerOptions { WriteIndented = true, Converters = { new IdentityJsonConverter() } });
+            //var a = EventMapping.Convert(e);
+            //var json = JsonSerializer.Serialize(a, new JsonSerializerOptions { WriteIndented = true, Converters = { new IdentityJsonConverter() } });
 
-            System.Console.WriteLine(json);
+            //System.Console.WriteLine(json);
 
-            var data2 = JsonSerializer.Deserialize<OrderCreated>(json);
-            var e2 = EventMapping.Convert2(data2);
+            //var data2 = JsonSerializer.Deserialize<OrderCreated>(json);
+            //var e2 = EventMapping.Convert2(data2);
 
-            System.Console.WriteLine(JsonSerializer.Serialize(e, e.GetType(), new JsonSerializerOptions { WriteIndented = true }));
+            //System.Console.WriteLine(JsonSerializer.Serialize(e, e.GetType(), new JsonSerializerOptions { WriteIndented = true }));
 
-            return;
+            //return;
 
             var eventStore = new EventStore();
+
+            var product = Product.Create(ProductName.Create("Brood"));
+
+            var productRepository = new Repository<Product, ProductIdentity>(eventStore);
+            productRepository.Save(product);
+
+            product.ChangeProductName(ProductName.Create("Boterham"));
+            productRepository.Save(product);
+
+
+            var productRepository2 = new Repository<Product, ProductIdentity>(eventStore);
+            
+            var product2 = productRepository2.Load(product.Identity);
+
+            System.Console.WriteLine(JsonSerializer.Serialize(product, new JsonSerializerOptions { WriteIndented = true }));
+            System.Console.WriteLine(JsonSerializer.Serialize(product2, new JsonSerializerOptions { WriteIndented = true }));
+
+
 
             var orderRepository = new Repository<Order, OrderIdentity>(eventStore);
 

@@ -44,7 +44,7 @@ namespace DDD.Core
             IAggregateLoader loader = aggregate;
             var changes = loader.GetUncommittedChanges();
             var streamName = aggregate.Identity.ToString();
-            _eventStore.SaveEvents(streamName, changes.ToArray());
+            _eventStore.SaveEvents(streamName, aggregate.Version,changes.ToArray());
             loader.MarkChangesAsCommitted();
         }
     }

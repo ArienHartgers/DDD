@@ -18,6 +18,7 @@ namespace DDD.Core
 
         void IAggregateLoader.MarkChangesAsCommitted()
         {
+            Version += _changes.Count;
             _changes.Clear();
         }
 
@@ -38,7 +39,14 @@ namespace DDD.Core
         {
             IEventApplier applier = this;
             applier.ProcessMessage(@event);
-            if (isNew) _changes.Add(@event);
+            if (isNew)
+            {
+                _changes.Add(@event);
+            }
+            else
+            {
+                Version += 1;
+            }
         }
     }
 }
