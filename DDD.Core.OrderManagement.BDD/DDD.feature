@@ -16,7 +16,7 @@ Scenario: Add order line citron
 
 Scenario: Create a new order with an item
 	When I create an order
-	#And I add 1 items of product pepper to the order
+	And I add 1 items of product pepper to the order
 	Then Order is created
 	And Product pepper is added with an quantity of 1
 
