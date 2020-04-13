@@ -1,7 +1,4 @@
 ﻿Feature: DDD
-	In order to avoid silly mistakes
-	As a math idiot
-	I want to be told the sum of two numbers
 
 Scenario: Create a new order
 	When I create an order
@@ -19,7 +16,7 @@ Scenario: Add order line citron
 
 Scenario: Create a new order with an item
 	When I create an order
-	And I add 1 items of product pepper to the order
+	#And I add 1 items of product pepper to the order
 	Then Order is created
 	And Product pepper is added with an quantity of 1
 

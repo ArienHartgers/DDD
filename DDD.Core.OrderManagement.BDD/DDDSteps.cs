@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DDD.Core.OrderManagement.Orders;
-using DDD.Core.OrderManagement.Orders.Events;
 using TechTalk.SpecFlow;
+using DDD.Core.OrderManagement.Orders.Events;
 using DDD.Core.OrderManagement.Orders.Commands;
+using DDD.Core.OrderManagement.Orders.Entities;
+using DDD.Core.OrderManagement.Orders.Identities;
 using Shouldly;
 
 namespace DDD.Core.OrderManagement.BDD
@@ -13,7 +14,7 @@ namespace DDD.Core.OrderManagement.BDD
     public class DDDSteps
     {
         // Common
-        private readonly Guid _orderGuid;
+        private readonly OrderIdentity _orderIdentity;
 
         // Given
         private EventStore? _eventStore;
@@ -27,13 +28,13 @@ namespace DDD.Core.OrderManagement.BDD
         public DDDSteps()
         {
             _eventStore = new EventStore();
-            _orderGuid = Guid.NewGuid();
+            _orderIdentity = OrderIdentity.New();
         }
 
         [Given(@"I have an order")]
         public void GivenIHaveAnOrder()
         {
-            AddEvent(new OrderCreatedEvent(_orderGuid));
+            AddEvent(new OrderCreated(_orderIdentity));
         }
 
         [Given(@"order has an item product (.*) whith quantity (.*)")]
@@ -41,7 +42,7 @@ namespace DDD.Core.OrderManagement.BDD
         {
             AddEvent(new OrderLineCreatedEvent
             {
-                LineId = 1,
+                OrderLineIdentity = OrderLineIdentity.Create(1),
                 ProductName = product,
                 Quantity = quantity,
             });
@@ -61,18 +62,18 @@ namespace DDD.Core.OrderManagement.BDD
         }
 
         [When(@"I change quantity to (.*) from orderline with id (.*)")]
-        public void WhenIChangeQuantityToFromOrderlineWithId(int quantity, int id)
+        public void WhenIChangeQuantityToFromOrderlineWithId(int quantity, string id)
         {
-            var orderLineIdentity = new OrderLineIdentity(id);
+            var orderLineIdentity = OrderLineIdentity.Parse(id);
             var order = GetOrder();
             order.AdjustOrderLineQuantity(orderLineIdentity, quantity);
         }
 
         [When(@"I remove line with identity (.*) from order")]
-        public void WhenIRemoveLineWithIdentityFromOrder(int id)
+        public void WhenIRemoveLineWithIdentityFromOrder(string id)
         {
             var order = GetOrder();
-            order.RemoveOrderLine(new OrderLineIdentity(id));
+            order.RemoveOrderLine(OrderLineIdentity.Parse(id));
         }
 
         [Then("No Result is expected")]
@@ -84,9 +85,9 @@ namespace DDD.Core.OrderManagement.BDD
         [Then("Order is created")]
         public void ThenOrderIsCreated()
         {
-            var orderCreatedEvent = ThenGetEvent<OrderCreatedEvent>();
+            var orderCreatedEvent = ThenGetEvent<OrderCreated>();
             orderCreatedEvent.ShouldNotBeNull();
-            //orderCreatedEvent.Id.ShouldBe(_orderGuid);
+            //orderCreatedEvent.Id.ShouldBe(_orderIdentity);
         }
 
         [Then(@"Product (.*) is added with an quantity of (.*)")]
@@ -103,7 +104,7 @@ namespace DDD.Core.OrderManagement.BDD
         {
             var orderLineCreatedEvent = ThenGetEvent<OrderLineRemovedEvent>();
             orderLineCreatedEvent.ShouldNotBeNull();
-            orderLineCreatedEvent.LineId.ShouldBe(id);
+            orderLineCreatedEvent.OrderLineIdentity.LineId.ShouldBe(id);
         }
 
         [Then(@"itemline (.*) quantity is changed to (.*)")]
@@ -111,7 +112,7 @@ namespace DDD.Core.OrderManagement.BDD
         {
             var orderLineQuantityAdjustedEvent = ThenGetEvent<OrderLineQuantityAdjustedEvent>();
             orderLineQuantityAdjustedEvent.ShouldNotBeNull();
-            orderLineQuantityAdjustedEvent.OrderId.OrderGuid.ShouldBe(_orderGuid);
+            orderLineQuantityAdjustedEvent.OrderIdentity.ShouldBe(_orderIdentity);
             orderLineQuantityAdjustedEvent.OrderLineIdentity.LineId.ShouldBe(id);
             orderLineQuantityAdjustedEvent.Quantity.ShouldBe(quantity);
         }
@@ -130,7 +131,7 @@ namespace DDD.Core.OrderManagement.BDD
                 throw new Exception("Add event can only be used in 'Given' mode");
             }
 
-            _eventStore.SaveEvents(_orderGuid.ToString(), new LoadedEvent(DateTimeOffset.Now, @event));
+            _eventStore.SaveEvents(_orderIdentity.ToString(), new LoadedEvent(DateTimeOffset.Now, @event));
         }
 
         private void Then()
@@ -177,7 +178,7 @@ namespace DDD.Core.OrderManagement.BDD
                 }
 
                 var orderRepository = new Repository<Order, OrderIdentity>(_eventStore);
-                _order = orderRepository.Load(_orderGuid);
+                _order = orderRepository.Load(_orderIdentity);
                 _eventStore = null;
             }
 

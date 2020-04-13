@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace DDD.Core
 {
     public abstract class AggregateRoot<TIdentity> : Entity<TIdentity>, IAggregateLoader
-        where TIdentity : class
+        where TIdentity : IIdentity
     {
 
         private readonly List<LoadedEvent> _changes = new List<LoadedEvent>();

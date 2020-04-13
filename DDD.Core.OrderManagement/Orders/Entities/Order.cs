@@ -1,26 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using DDD.Core.OrderManagement.Orders.Events;
+using DDD.Core.OrderManagement.Orders.Identities;
 
-namespace DDD.Core.OrderManagement.Orders
+namespace DDD.Core.OrderManagement.Orders.Entities
 {
     public class Order : AggregateRoot<OrderIdentity>
     {
-        private readonly List<OrderLine> _orderLines = new List<OrderLine>();
-        private OrderIdentity _identity = null!;
+        private readonly EntityCollection<OrderLine, OrderLineIdentity> _orderLines = new EntityCollection<OrderLine, OrderLineIdentity>();
+        private OrderIdentity? _identity;
 
         private Order()
         {
-            RegisterEvent<OrderCreatedEvent>(OrderCreatedEventHandler);
+            RegisterEvent<OrderCreated>(OrderCreatedEventHandler);
             RegisterEvent<OrderCustomerNameChangedEvent>(OrderCustomerNameChangedEventHandler);
+
+            // OrderLines
             RegisterEvent<OrderLineCreatedEvent>(OrderLineCreatedEventHandler);
             RegisterEvent<OrderLineRemovedEvent>(OrderLineRemovedEventHandler);
-
-            RegisterEvent<OrderLineQuantityAdjustedEvent>(e => e.ForwardTo(FindOrderLine(e.Event.OrderLineIdentity)));
+            RegisterEvent<OrderLineQuantityAdjustedEvent>(e => e.ForwardTo(_orderLines.Get(e.Event.OrderLineIdentity)));
         }
 
-        public override OrderIdentity Identity => _identity;
+        public override OrderIdentity Identity => _identity ?? throw new EntityNotInitializedException(nameof(Order));
 
         public DateTimeOffset Created { get; private set; }
 
@@ -28,27 +28,25 @@ namespace DDD.Core.OrderManagement.Orders
 
         public string CustomerName { get; private set; } = null!;
 
-        public IReadOnlyCollection<OrderLine> OrderLines => _orderLines;
+        public IEntityCollection<OrderLine, OrderLineIdentity> OrderLines => _orderLines;
 
-        public OrderLine FindOrderLine(OrderLineIdentity id)
+        public OrderLine? FindOrderLine(OrderLineIdentity id)
         {
-            return _orderLines.FirstOrDefault(ol => ol.Identity == id);
+            return _orderLines.Find(id);
         }
-
-        public int LastOrderLineId { get; private set; }
 
 
         public static Order Create()
         {
             var order = new Order();
-            order.ApplyChange(new OrderCreatedEvent(Guid.NewGuid()));
+            order.ApplyChange(new OrderCreated(OrderIdentity.New()));
 
             return order;
         }
 
-        private void OrderCreatedEventHandler(HandlerEvent<OrderCreatedEvent> handlerEvent)
+        private void OrderCreatedEventHandler(HandlerEvent<OrderCreated> handlerEvent)
         {
-            _identity = new OrderIdentity(handlerEvent.Event.Id);
+            _identity = handlerEvent.Event.OrderIdentity;
             Created = handlerEvent.EventDateTime;
             LastUpdate = handlerEvent.EventDateTime;
         }
@@ -61,7 +59,6 @@ namespace DDD.Core.OrderManagement.Orders
 
         private void OrderLineCreatedEventHandler(HandlerEvent<OrderLineCreatedEvent> handlerEvent)
         {
-            LastOrderLineId = handlerEvent.Event.LineId;
             var orderLine = new OrderLine();
             handlerEvent.ForwardTo(orderLine);
             _orderLines.Add(orderLine);
@@ -69,11 +66,7 @@ namespace DDD.Core.OrderManagement.Orders
 
         private void OrderLineRemovedEventHandler(HandlerEvent<OrderLineRemovedEvent> handlerEvent)
         {
-            var orderLine = FindOrderLine(new OrderLineIdentity(handlerEvent.Event.LineId));
-            if (orderLine != null)
-            {
-                _orderLines.Remove(orderLine);
-            }
+            _orderLines.Remove(handlerEvent.Event.OrderLineIdentity);
         }
 
     }

@@ -7,6 +7,7 @@ namespace DDD.Core
 {
     public class EventStore
     {
+        private readonly IReadOnlyCollection<LoadedEvent> _noEvents = new List<LoadedEvent>(0);
         private readonly Dictionary<string, List<LoadedEvent>> _streams = new Dictionary<string, List<LoadedEvent>>();
 
         public void SaveEvents(string streamName, params LoadedEvent[] changes)
@@ -23,14 +24,14 @@ namespace DDD.Core
             loadedEvents.AddRange(changes);
         }
 
-        public IEnumerable<LoadedEvent> GetStreamEvents(string streamName)
+        public IReadOnlyCollection<LoadedEvent> GetStreamEvents(string streamName)
         {
             if (_streams.TryGetValue(streamName, out var loadedEvents))
             {
                 return loadedEvents;
             }
 
-            return Enumerable.Empty<LoadedEvent>();
+            return _noEvents;
         }
     }
 }

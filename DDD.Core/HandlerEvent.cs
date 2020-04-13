@@ -15,7 +15,7 @@ namespace DDD.Core
 
         public void ForwardTo(IEventApplier applier)
         {
-            applier?.ProcessMessage(this);
+            applier.ProcessMessage(this);
         }
     }
 }

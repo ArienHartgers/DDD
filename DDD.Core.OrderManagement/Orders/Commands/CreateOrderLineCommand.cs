@@ -1,5 +1,7 @@
 ﻿using System.Linq;
+using DDD.Core.OrderManagement.Orders.Entities;
 using DDD.Core.OrderManagement.Orders.Events;
+using DDD.Core.OrderManagement.Orders.Identities;
 
 namespace DDD.Core.OrderManagement.Orders.Commands
 {
@@ -7,7 +9,7 @@ namespace DDD.Core.OrderManagement.Orders.Commands
     {
         public static OrderLineIdentity CreateOrderLine(this Order order, string product, int quantity)
         {
-            var itemLine = order.OrderLines.FirstOrDefault(ol => ol.ProductName == product);
+            var itemLine = order.OrderLines.Entities.FirstOrDefault(ol => ol.ProductName == product);
             if (itemLine != null)
             {
                 order.ApplyChange(new OrderLineQuantityAdjustedEvent(
@@ -18,10 +20,10 @@ namespace DDD.Core.OrderManagement.Orders.Commands
                 return itemLine.Identity;
             }
 
-            var identity = new OrderLineIdentity(order.LastOrderLineId + 1);
+            var identity = OrderLineIdentity.NextIdentity(order.OrderLines.MaxIdentity);
             order.ApplyChange(new OrderLineCreatedEvent
             {
-                LineId = identity.LineId,
+                OrderLineIdentity = identity,
                 ProductName = product,
                 Quantity = quantity,
             });

@@ -1,4 +1,5 @@
 ﻿using System;
+using DDD.Core.OrderManagement.Orders.Entities;
 using DDD.Core.OrderManagement.Orders.Events;
 
 namespace DDD.Core.OrderManagement.Orders.Commands

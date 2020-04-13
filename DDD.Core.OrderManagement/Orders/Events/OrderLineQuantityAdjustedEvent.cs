@@ -1,4 +1,5 @@
 ﻿using System;
+using DDD.Core.OrderManagement.Orders.Identities;
 
 namespace DDD.Core.OrderManagement.Orders.Events
 {
@@ -10,12 +11,12 @@ namespace DDD.Core.OrderManagement.Orders.Events
 
         public OrderLineQuantityAdjustedEvent(OrderIdentity orderIdentity, OrderLineIdentity orderLineIdentity, int quantity)
         {
-            OrderId = orderIdentity;
+            OrderIdentity = orderIdentity;
             OrderLineIdentity = orderLineIdentity;
             Quantity = quantity;
         }
 
-        public OrderIdentity OrderId { get; set; }
+        public OrderIdentity OrderIdentity { get; set; }
         public OrderLineIdentity OrderLineIdentity { get; set; }
         public int Quantity { get; set; }
     }

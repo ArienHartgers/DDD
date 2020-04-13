@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace DDD.Core
 {
     public abstract class Entity<TIdentity> : IEventApplier
-        where TIdentity : class
+        where TIdentity : IIdentity
     {
 
         private readonly Dictionary<Type, MessageHandler>
