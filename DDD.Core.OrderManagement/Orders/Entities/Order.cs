@@ -7,11 +7,16 @@ namespace DDD.Core.OrderManagement.Orders.Entities
     public class Order : AggregateRoot<OrderIdentity>
     {
         private readonly EntityCollection<OrderLine, OrderLineIdentity> _orderLines = new EntityCollection<OrderLine, OrderLineIdentity>();
-        private OrderIdentity _identity;
 
-        private Order()
+        private Order(TypedEvent<OrderCreated> initialEvent)
         {
-            RegisterEvent<OrderCreated>(OrderCreatedEventHandler);
+            Created = initialEvent.EventDateTime;
+            LastUpdate = initialEvent.EventDateTime;
+
+            Identity = initialEvent.Event.OrderIdentity;
+            CustomerIdentity = initialEvent.Event.CustomerIdentity;
+            CustomerName = initialEvent.Event.CustomerIdentity.CustomerGuid.ToString();
+
             RegisterEvent<OrderCustomerNameChangedEvent>(OrderCustomerNameChangedEventHandler);
 
             // OrderLines
@@ -20,35 +25,21 @@ namespace DDD.Core.OrderManagement.Orders.Entities
             RegisterEvent<OrderLineQuantityAdjustedEvent>(e => e.ForwardTo(_orderLines.Get(e.Event.OrderLineIdentity)));
         }
 
-        public override OrderIdentity Identity => _identity ?? throw new EntityNotInitializedException(nameof(Order));
-
+        public override OrderIdentity Identity { get; }
+    
         public DateTimeOffset Created { get; private set; }
+
+        public CustomerIdentity CustomerIdentity { get; }
 
         public DateTimeOffset LastUpdate { get; private set; }
 
-        public string CustomerName { get; private set; } = null!;
+        public string CustomerName { get; private set; }
 
         public IEntityCollection<OrderLine, OrderLineIdentity> OrderLines => _orderLines;
 
         public OrderLine? FindOrderLine(OrderLineIdentity id)
         {
             return _orderLines.Find(id);
-        }
-
-
-        public static Order Create()
-        {
-            var order = new Order();
-            order.ApplyChange(new OrderCreated(OrderIdentity.New()));
-
-            return order;
-        }
-
-        private void OrderCreatedEventHandler(HandlerEvent<OrderCreated> handlerEvent)
-        {
-            _identity = handlerEvent.Event.OrderIdentity;
-            Created = handlerEvent.EventDateTime;
-            LastUpdate = handlerEvent.EventDateTime;
         }
 
         private void OrderCustomerNameChangedEventHandler(HandlerEvent<OrderCustomerNameChangedEvent> handlerEvent)

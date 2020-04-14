@@ -1,11 +1,9 @@
 ﻿using System.Text.Json;
-using DDD.Core;
 using DDD.Core.OrderManagement.BDD;
+using DDD.Core.OrderManagement.Orders;
 using DDD.Core.OrderManagement.Orders.Commands;
-using DDD.Core.OrderManagement.Orders.Entities;
-using DDD.Core.OrderManagement.Orders.Identities;
+using DDD.Core.OrderManagement.Products;
 using DDD.Core.OrderManagement.Products.Commands;
-using DDD.Core.OrderManagement.Products.Entities;
 using DDD.Core.OrderManagement.Products.Identities;
 using DDD.Core.OrderManagement.Products.ValueObjects;
 
@@ -33,17 +31,17 @@ namespace DDD.App
             //return;
 
             var eventStore = new TestEventStore();
+            var productRepository = new ProductRepository(eventStore);
 
-            var product = Product.Create(ProductName.Create("Brood"));
+            var product = productRepository.Create(ProductName.Create("Brood"));
 
-            var productRepository = new Repository<Product, ProductIdentity>(eventStore);
             productRepository.Save(product);
 
             product.ChangeProductName(ProductName.Create("Boterham"));
             productRepository.Save(product);
 
 
-            var productRepository2 = new Repository<Product, ProductIdentity>(eventStore);
+            var productRepository2 = new ProductRepository(eventStore);
             
             var product2 = productRepository2.Get(product.Identity);
 
@@ -52,10 +50,14 @@ namespace DDD.App
 
 
 
-            var orderRepository = new Repository<Order, OrderIdentity>(eventStore);
+            var orderRepository = new OrderRepository(eventStore);
 
-            //var order = orderRepository.Load(OrderIdentity.New());
-            var order = Order.Create();
+            var order = orderRepository.Create();
+
+            orderRepository.Save(order);
+
+            var order2 = orderRepository.Get(order.Identity);
+
 
             order.ChangeOrderCustomerName("Ilonka");
 
@@ -63,7 +65,7 @@ namespace DDD.App
 
 
 
-            var orderLineIdentity = order.CreateOrderLine("Brood", 1);
+            var orderLineIdentity = order.CreateOrderLine(ProductIdentity.Parse( "Brood"), 1);
 
             System.Console.WriteLine(JsonSerializer.Serialize(order, new JsonSerializerOptions { WriteIndented = true }));
 
@@ -83,7 +85,7 @@ namespace DDD.App
 
 
             order.RemoveOrderLine(orderLineIdentity);
-            order.CreateOrderLine("Brood2", 1);
+            order.CreateOrderLine(ProductIdentity.Parse("Brood2"), 1);
 
             orderRepository.Save(order);
             System.Console.WriteLine(JsonSerializer.Serialize(order, new JsonSerializerOptions { WriteIndented = true }));

@@ -1,14 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DDD.Core
 {
     public abstract class AggregateRoot<TIdentity> : Entity<TIdentity>, IAggregateLoader
         where TIdentity : IIdentity
     {
+        private static bool _isChecked = false;
         private readonly List<LoadedEvent> _changes = new List<LoadedEvent>();
 
         public int Version { get; internal set; }
+
+        protected AggregateRoot()
+        {
+            if (!_isChecked)
+            {
+                _isChecked = true;
+                AssureReadonlyProperties();
+            }
+        }
 
         IEnumerable<LoadedEvent> IAggregateLoader.GetUncommittedChanges()
         {
@@ -27,6 +38,16 @@ namespace DDD.Core
             Version = version;
         }
 
+        internal void ApplyInitialEvent(LoadedEvent @event)
+        {
+            if (_changes.Any())
+            {
+                throw new Exception("ApplyInitialEvent can only be used for a new aggregate");
+            }
+
+            _changes.Add(@event);
+        }
+
         public void ApplyChange(Event @event)
         {
             ApplyChange(
@@ -42,6 +63,20 @@ namespace DDD.Core
             if (isNew)
             {
                 _changes.Add(@event);
+            }
+        }
+
+        private void AssureReadonlyProperties()
+        {
+            var properties = GetType().GetProperties();
+            foreach (var propertyInfo in properties)
+            {
+                if (propertyInfo.CanWrite
+                    && !propertyInfo.SetMethod.IsPrivate
+                    && !(propertyInfo.DeclaringType?.Name.StartsWith("AggregateRoot") ?? false))
+                {
+                    throw new Exception($"Aggregate '{GetType().Name}' may only have readonly properties. Property '{propertyInfo.Name}' can be public written");
+                }
             }
         }
     }

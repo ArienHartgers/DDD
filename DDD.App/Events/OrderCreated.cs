@@ -7,10 +7,6 @@
             OrderIdentity = orderIdentity;
         }
 
-        public OrderCreated()
-        {
-        }
-
         public string OrderIdentity { get; set; }
     }
 }

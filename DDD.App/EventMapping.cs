@@ -24,7 +24,8 @@ namespace DDD.App
             {
                 case DDD.App.Events.OrderCreated orderCreated:
                     return new Core.OrderManagement.Orders.Events.OrderCreated(
-                        OrderIdentity.Parse(orderCreated.OrderIdentity));
+                        OrderIdentity.Parse(orderCreated.OrderIdentity),
+                        CustomerIdentity.New());
                 default: throw new Exception("Unknown event type");
             }
         }

@@ -1,5 +1,6 @@
 ﻿using DDD.Core.OrderManagement.Orders.Events;
 using DDD.Core.OrderManagement.Orders.Identities;
+using DDD.Core.OrderManagement.Products.Identities;
 
 namespace DDD.Core.OrderManagement.Orders.Entities
 {
@@ -12,9 +13,8 @@ namespace DDD.Core.OrderManagement.Orders.Entities
             RegisterEvent<OrderLineCreatedEvent>(handlerEvent =>
             {
                 _identity = handlerEvent.Event.OrderLineIdentity;
-                ProductName = handlerEvent.Event.ProductName;
+                ProductIdentity = handlerEvent.Event.ProductIdentity;
                 Quantity = handlerEvent.Event.Quantity;
-                
             });
 
             RegisterEvent<OrderLineQuantityAdjustedEvent>(handlerEvent =>
@@ -24,7 +24,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
         }
 
         public override OrderLineIdentity Identity => _identity ?? throw new EntityNotInitializedException(nameof(OrderLine));
-        public string ProductName { get; private set; } = null!;
+        public ProductIdentity ProductIdentity { get; private set; } = null!;
         public int Quantity { get; private set; }
 
     }

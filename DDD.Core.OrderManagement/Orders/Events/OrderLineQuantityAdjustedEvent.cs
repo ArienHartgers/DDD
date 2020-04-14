@@ -5,10 +5,6 @@ namespace DDD.Core.OrderManagement.Orders.Events
 {
     public class OrderLineQuantityAdjustedEvent : Event
     {
-        public OrderLineQuantityAdjustedEvent()
-        {
-        }
-
         public OrderLineQuantityAdjustedEvent(OrderIdentity orderIdentity, OrderLineIdentity orderLineIdentity, int quantity)
         {
             OrderIdentity = orderIdentity;

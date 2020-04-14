@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DDD.Core.OrderManagement.Orders;
 using TechTalk.SpecFlow;
 using DDD.Core.OrderManagement.Orders.Events;
 using DDD.Core.OrderManagement.Orders.Commands;
 using DDD.Core.OrderManagement.Orders.Entities;
 using DDD.Core.OrderManagement.Orders.Identities;
+using DDD.Core.OrderManagement.Products.Identities;
 using Shouldly;
 
 namespace DDD.Core.OrderManagement.BDD
@@ -34,18 +36,16 @@ namespace DDD.Core.OrderManagement.BDD
         [Given(@"I have an order")]
         public void GivenIHaveAnOrder()
         {
-            AddEvent(new OrderCreated(_orderIdentity));
+            AddEvent(new OrderCreated(_orderIdentity, CustomerIdentity.New()));
         }
 
         [Given(@"order has an item product (.*) whith quantity (.*)")]
-        public void GivenOrderHasAnItemProductWhithQuantity(string product, int quantity)
+        public void GivenOrderHasAnItemProductWithQuantity(string product, int quantity)
         {
-            AddEvent(new OrderLineCreatedEvent
-            {
-                OrderLineIdentity = OrderLineIdentity.Create(1),
-                ProductName = product,
-                Quantity = quantity,
-            });
+            AddEvent(new OrderLineCreatedEvent(
+                OrderLineIdentity.Create(1),
+                ProductIdentity.Parse(product),
+                quantity));
         }
 
         [When(@"I create an order")]
@@ -58,7 +58,7 @@ namespace DDD.Core.OrderManagement.BDD
         public void WhenIAddItemOneToTheOrder(int quantity, string product)
         {
             var order = GetOrder();
-            order.CreateOrderLine(product, quantity);
+            order.CreateOrderLine(ProductIdentity.Parse(product), quantity);
         }
 
         [When(@"I change quantity to (.*) from orderline with id (.*)")]
@@ -95,7 +95,7 @@ namespace DDD.Core.OrderManagement.BDD
         {
             var orderLineCreatedEvent = ThenGetEvent<OrderLineCreatedEvent>();
             orderLineCreatedEvent.ShouldNotBeNull();
-            orderLineCreatedEvent.ProductName.ShouldBe(product);
+            orderLineCreatedEvent.ProductIdentity.ShouldBe(ProductIdentity.Parse(product));
             orderLineCreatedEvent.Quantity.ShouldBe(count);
         }
 
@@ -164,7 +164,15 @@ namespace DDD.Core.OrderManagement.BDD
 
         private Order CreateOrder()
         {
-            _order = Order.Create();
+            if (_eventStore == null)
+            {
+                throw new Exception("Event store is null");
+            }
+
+            var orderRepository = new OrderRepository(_eventStore);
+
+            _order = orderRepository.Create();
+
             return _order;
         }
 
@@ -177,7 +185,7 @@ namespace DDD.Core.OrderManagement.BDD
                     throw new Exception("Event store is null");
                 }
 
-                var orderRepository = new Repository<Order, OrderIdentity>(_eventStore);
+                var orderRepository = new OrderRepository(_eventStore);
                 _order = orderRepository.Get(_orderIdentity);
                 _eventStore = null;
             }

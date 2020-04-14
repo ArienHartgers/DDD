@@ -7,37 +7,23 @@ namespace DDD.Core.OrderManagement.Products.Entities
 {
     public class Product : AggregateRoot<ProductIdentity>
     {
-        private ProductIdentity? _identity;
-
-        private Product()
+        private Product(TypedEvent<ProductCreated> initialEvent)
         {
-            RegisterEvent<ProductCreated>(ProductCreatedEventHandler);
+            Created = initialEvent.EventDateTime;
+            LastUpdate = initialEvent.EventDateTime;
+            Identity = initialEvent.Event.ProductIdentity;
+            ProductName = initialEvent.Event.ProductName;
+
             RegisterEvent<ProductNameChanged>(ProductNameChangedEventHandler);
         }
 
-        public override ProductIdentity Identity => _identity ?? throw new EntityNotInitializedException(nameof(Product));
+        public override ProductIdentity Identity { get; }
 
-        public DateTimeOffset Created { get; private set; }
+        public DateTimeOffset Created { get; }
 
         public DateTimeOffset LastUpdate { get; private set; }
         
         public ProductName ProductName { get; private set; }
-
-        public static Product Create(ProductName productName)
-        {
-            var order = new Product();
-            order.ApplyChange(new ProductCreated(ProductIdentity.New(), productName));
-
-            return order;
-        }
-
-        private void ProductCreatedEventHandler(HandlerEvent<ProductCreated> handlerEvent)
-        {
-            _identity = handlerEvent.Event.ProductIdentity;
-            Created = handlerEvent.EventDateTime;
-            LastUpdate = handlerEvent.EventDateTime;
-            ProductName = handlerEvent.Event.ProductName;
-        }
 
         private void ProductNameChangedEventHandler(HandlerEvent<ProductNameChanged> handlerEvent)
         {
