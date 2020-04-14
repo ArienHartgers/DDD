@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
-using DDD.App.Events;
 using DDD.Core;
-using DDD.Core.OrderManagement.Orders;
+using DDD.Core.OrderManagement.BDD;
 using DDD.Core.OrderManagement.Orders.Commands;
 using DDD.Core.OrderManagement.Orders.Entities;
 using DDD.Core.OrderManagement.Orders.Identities;
@@ -33,7 +32,7 @@ namespace DDD.App
 
             //return;
 
-            var eventStore = new EventStore();
+            var eventStore = new TestEventStore();
 
             var product = Product.Create(ProductName.Create("Brood"));
 
@@ -46,7 +45,7 @@ namespace DDD.App
 
             var productRepository2 = new Repository<Product, ProductIdentity>(eventStore);
             
-            var product2 = productRepository2.Load(product.Identity);
+            var product2 = productRepository2.Get(product.Identity);
 
             System.Console.WriteLine(JsonSerializer.Serialize(product, new JsonSerializerOptions { WriteIndented = true }));
             System.Console.WriteLine(JsonSerializer.Serialize(product2, new JsonSerializerOptions { WriteIndented = true }));

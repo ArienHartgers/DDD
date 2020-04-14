@@ -6,7 +6,6 @@ namespace DDD.Core
     public abstract class AggregateRoot<TIdentity> : Entity<TIdentity>, IAggregateLoader
         where TIdentity : IIdentity
     {
-
         private readonly List<LoadedEvent> _changes = new List<LoadedEvent>();
 
         public int Version { get; internal set; }
@@ -22,9 +21,10 @@ namespace DDD.Core
             _changes.Clear();
         }
 
-        void IAggregateLoader.LoadFromHistory(IEnumerable<LoadedEvent> history)
+        void IAggregateLoader.LoadFromHistory(int version, IEnumerable<LoadedEvent> history)
         {
             foreach (var e in history) ApplyChange(e, false);
+            Version = version;
         }
 
         public void ApplyChange(Event @event)
@@ -42,10 +42,6 @@ namespace DDD.Core
             if (isNew)
             {
                 _changes.Add(@event);
-            }
-            else
-            {
-                Version += 1;
             }
         }
     }

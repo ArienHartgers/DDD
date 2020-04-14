@@ -8,17 +8,28 @@ namespace DDD.Core
         where TIdentity : IIdentity
         where TAggregateRoot : AggregateRoot<TIdentity>, IAggregateLoader
     {
-        private readonly EventStore _eventStore;
+        private readonly IEventStore _eventStore;
 
-        public Repository(EventStore eventStore)
+        public Repository(IEventStore eventStore)
         {
             _eventStore = eventStore;
         }
 
-        public TAggregateRoot Load(IIdentity identity)
+        public TAggregateRoot Get(IIdentity identity)
         {
-            var events = _eventStore.GetStreamEvents(identity.Identity);
-            if (events.Any())
+            var agg = Find(identity);
+            if (agg == null)
+            {
+                throw new Exception($"{typeof(TAggregateRoot).Name} with identity '{identity}' not found");
+            }
+
+            return agg;
+        }
+
+        public TAggregateRoot? Find(IIdentity identity)
+        {
+            var eventsResult = _eventStore.GetStreamEvents(identity.Identity);
+            if (eventsResult.Events.Any())
             {
                 var constructors =
                     typeof(TAggregateRoot).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic);
@@ -32,7 +43,7 @@ namespace DDD.Core
                 var aggregate = (TAggregateRoot) constructor.Invoke(new object[0]);
 
                 IAggregateLoader loader = aggregate;
-                loader.LoadFromHistory(events);
+                loader.LoadFromHistory(eventsResult.Version, eventsResult.Events);
                 return aggregate;
             }
 

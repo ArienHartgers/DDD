@@ -17,7 +17,7 @@ namespace DDD.Core.OrderManagement.BDD
         private readonly OrderIdentity _orderIdentity;
 
         // Given
-        private EventStore? _eventStore;
+        private TestEventStore? _eventStore;
 
         // When
         private Order? _order;
@@ -27,7 +27,7 @@ namespace DDD.Core.OrderManagement.BDD
 
         public DDDSteps()
         {
-            _eventStore = new EventStore();
+            _eventStore = new TestEventStore();
             _orderIdentity = OrderIdentity.New();
         }
 
@@ -131,7 +131,7 @@ namespace DDD.Core.OrderManagement.BDD
                 throw new Exception("Add event can only be used in 'Given' mode");
             }
 
-            _eventStore.SaveEvents(_orderIdentity.ToString(), new LoadedEvent(DateTimeOffset.Now, @event));
+            _eventStore.AddTestEvents(_orderIdentity.ToString(), new LoadedEvent(DateTimeOffset.Now, @event));
         }
 
         private void Then()
@@ -178,7 +178,7 @@ namespace DDD.Core.OrderManagement.BDD
                 }
 
                 var orderRepository = new Repository<Order, OrderIdentity>(_eventStore);
-                _order = orderRepository.Load(_orderIdentity);
+                _order = orderRepository.Get(_orderIdentity);
                 _eventStore = null;
             }
 

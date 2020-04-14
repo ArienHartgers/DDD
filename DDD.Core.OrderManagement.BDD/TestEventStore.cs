@@ -1,16 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
 
-namespace DDD.Core
+namespace DDD.Core.OrderManagement.BDD
 {
-    public class EventStore
+    public class TestEventStore : IEventStore
     {
-        private readonly IReadOnlyCollection<LoadedEvent> _noEvents = new List<LoadedEvent>(0);
+        private readonly GetStreamEventsResult _noEvents = new GetStreamEventsResult(0, new List<LoadedEvent>(0));
         private readonly Dictionary<string, List<LoadedEvent>> _streams = new Dictionary<string, List<LoadedEvent>>();
 
-        public void SaveEvents(string streamName, int expectedVersion, params LoadedEvent[] changes)
+        public void AddTestEvents(string streamName, params LoadedEvent[] changes)
+        {
+            if (!_streams.TryGetValue(streamName, out var loadedEvents))
+            {
+                loadedEvents = new List<LoadedEvent>();
+                _streams.Add(streamName, loadedEvents);
+            }
+
+            loadedEvents.AddRange(changes);
+        }
+
+        void IEventStore.SaveEvents(string streamName, int expectedVersion, IEnumerable<LoadedEvent> changes)
         {
             //Console.WriteLine($"=== Save ==={streamName}===");
             //Console.WriteLine(JsonSerializer.Serialize(changes, new JsonSerializerOptions { WriteIndented = true }));
@@ -30,11 +39,11 @@ namespace DDD.Core
             loadedEvents.AddRange(changes);
         }
 
-        public IReadOnlyCollection<LoadedEvent> GetStreamEvents(string streamName)
+        GetStreamEventsResult IEventStore.GetStreamEvents(string streamName)
         {
             if (_streams.TryGetValue(streamName, out var loadedEvents))
             {
-                return loadedEvents;
+                return new GetStreamEventsResult(loadedEvents.Count, loadedEvents);
             }
 
             return _noEvents;

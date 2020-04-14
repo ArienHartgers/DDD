@@ -7,7 +7,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
     public class Order : AggregateRoot<OrderIdentity>
     {
         private readonly EntityCollection<OrderLine, OrderLineIdentity> _orderLines = new EntityCollection<OrderLine, OrderLineIdentity>();
-        private OrderIdentity? _identity;
+        private OrderIdentity _identity;
 
         private Order()
         {
