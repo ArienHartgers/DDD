@@ -14,7 +14,7 @@ namespace DDD.Core.OrderManagement.Orders.Identities
 
         public override string Identity => $"Order_{OrderGuid}";
 
-        public static OrderIdentity Parse(string s)
+        public static OrderIdentity Create(string s)
         {
             if (s.StartsWith("Order_"))
             {

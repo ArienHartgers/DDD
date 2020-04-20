@@ -42,7 +42,8 @@ namespace DDD.Core.OrderManagement.BDD
         [Given(@"order has an item product (.*) whith quantity (.*)")]
         public void GivenOrderHasAnItemProductWithQuantity(string product, int quantity)
         {
-            AddEvent(new OrderLineCreatedEvent(
+            AddEvent(new OrderLineCreated(
+                _orderIdentity,
                 OrderLineIdentity.Create(1),
                 ProductIdentity.Parse(product),
                 quantity));
@@ -64,7 +65,7 @@ namespace DDD.Core.OrderManagement.BDD
         [When(@"I change quantity to (.*) from orderline with id (.*)")]
         public void WhenIChangeQuantityToFromOrderlineWithId(int quantity, string id)
         {
-            var orderLineIdentity = OrderLineIdentity.Parse(id);
+            var orderLineIdentity = OrderLineIdentity.Create(id);
             var order = GetOrder();
             order.AdjustOrderLineQuantity(orderLineIdentity, quantity);
         }
@@ -73,7 +74,7 @@ namespace DDD.Core.OrderManagement.BDD
         public void WhenIRemoveLineWithIdentityFromOrder(string id)
         {
             var order = GetOrder();
-            order.RemoveOrderLine(OrderLineIdentity.Parse(id));
+            order.RemoveOrderLine(OrderLineIdentity.Create(id));
         }
 
         [Then("No Result is expected")]
@@ -93,7 +94,7 @@ namespace DDD.Core.OrderManagement.BDD
         [Then(@"Product (.*) is added with an quantity of (.*)")]
         public void ThenProductPepperIsAddedWithAnQuantityOf(string product, int count)
         {
-            var orderLineCreatedEvent = ThenGetEvent<OrderLineCreatedEvent>();
+            var orderLineCreatedEvent = ThenGetEvent<OrderLineCreated>();
             orderLineCreatedEvent.ShouldNotBeNull();
             orderLineCreatedEvent.ProductIdentity.ShouldBe(ProductIdentity.Parse(product));
             orderLineCreatedEvent.Quantity.ShouldBe(count);
@@ -102,7 +103,7 @@ namespace DDD.Core.OrderManagement.BDD
         [Then(@"itemline (.*) is removed")]
         public void ThenItemlineIsRemoved(int id)
         {
-            var orderLineCreatedEvent = ThenGetEvent<OrderLineRemovedEvent>();
+            var orderLineCreatedEvent = ThenGetEvent<OrderLineRemoved>();
             orderLineCreatedEvent.ShouldNotBeNull();
             orderLineCreatedEvent.OrderLineIdentity.LineId.ShouldBe(id);
         }
@@ -110,7 +111,7 @@ namespace DDD.Core.OrderManagement.BDD
         [Then(@"itemline (.*) quantity is changed to (.*)")]
         public void ThenItemlineQuantityIsChangedTo(int id, int quantity)
         {
-            var orderLineQuantityAdjustedEvent = ThenGetEvent<OrderLineQuantityAdjustedEvent>();
+            var orderLineQuantityAdjustedEvent = ThenGetEvent<OrderLineQuantityAdjusted>();
             orderLineQuantityAdjustedEvent.ShouldNotBeNull();
             orderLineQuantityAdjustedEvent.OrderIdentity.ShouldBe(_orderIdentity);
             orderLineQuantityAdjustedEvent.OrderLineIdentity.LineId.ShouldBe(id);

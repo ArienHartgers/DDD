@@ -16,7 +16,7 @@ namespace DDD.Core.OrderManagement.Orders.Commands
             if (orderLine != null && orderLine.Quantity != quantity)
             {
                 order.ApplyChange(
-                    new OrderLineQuantityAdjustedEvent(
+                    new OrderLineQuantityAdjusted(
                         order.Identity,
                         orderLine.Identity,
                         quantity));

@@ -14,7 +14,7 @@ namespace DDD.Core.OrderManagement.Orders.Identities
 
         public override string Identity => $"Customer_{CustomerGuid}";
 
-        public static CustomerIdentity Parse(string s)
+        public static CustomerIdentity Create(string s)
         {
             if (s.StartsWith("Customer_"))
             {

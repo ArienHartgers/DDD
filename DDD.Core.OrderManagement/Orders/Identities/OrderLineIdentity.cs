@@ -20,17 +20,12 @@ namespace DDD.Core.OrderManagement.Orders.Identities
             return new OrderLineIdentity(lineId);
         }
 
-        protected override IEnumerable<object> GetEqualityComponents()
-        {
-            yield return LineId;
-        }
-
         public static OrderLineIdentity NextIdentity(OrderLineIdentity? lastOrderLineIdentity)
         {
             return new OrderLineIdentity(lastOrderLineIdentity?.LineId ?? 0 + 1);
         }
 
-        public static OrderLineIdentity Parse(string id)
+        public static OrderLineIdentity Create(string id)
         {
             if (int.TryParse(id, out int value))
             {
@@ -38,6 +33,11 @@ namespace DDD.Core.OrderManagement.Orders.Identities
             }
 
             throw new Exception($"Cannot parse id {id}");
+        }
+
+        protected override IEnumerable<object> GetEqualityComponents()
+        {
+            yield return LineId;
         }
     }
 }

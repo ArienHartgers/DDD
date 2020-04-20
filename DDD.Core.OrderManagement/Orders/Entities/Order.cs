@@ -17,12 +17,12 @@ namespace DDD.Core.OrderManagement.Orders.Entities
             CustomerIdentity = initialEvent.Event.CustomerIdentity;
             CustomerName = initialEvent.Event.CustomerIdentity.CustomerGuid.ToString();
 
-            RegisterEvent<OrderCustomerNameChangedEvent>(OrderCustomerNameChangedEventHandler);
+            RegisterEvent<OrderCustomerNameChanged>(OrderCustomerNameChangedEventHandler);
 
             // OrderLines
-            RegisterEvent<OrderLineCreatedEvent>(OrderLineCreatedEventHandler);
-            RegisterEvent<OrderLineRemovedEvent>(OrderLineRemovedEventHandler);
-            RegisterEvent<OrderLineQuantityAdjustedEvent>(e => e.ForwardTo(_orderLines.Get(e.Event.OrderLineIdentity)));
+            RegisterEvent<OrderLineCreated>(OrderLineCreatedEventHandler);
+            RegisterEvent<OrderLineRemoved>(OrderLineRemovedEventHandler);
+            RegisterEvent<OrderLineQuantityAdjusted>(e => e.ForwardTo(_orderLines.Get(e.Event.OrderLineIdentity)));
         }
 
         public override OrderIdentity Identity { get; }
@@ -42,20 +42,20 @@ namespace DDD.Core.OrderManagement.Orders.Entities
             return _orderLines.Find(id);
         }
 
-        private void OrderCustomerNameChangedEventHandler(HandlerEvent<OrderCustomerNameChangedEvent> handlerEvent)
+        private void OrderCustomerNameChangedEventHandler(HandlerEvent<OrderCustomerNameChanged> handlerEvent)
         {
             CustomerName = handlerEvent.Event.CustomerName;
             LastUpdate = handlerEvent.EventDateTime;
         }
 
-        private void OrderLineCreatedEventHandler(HandlerEvent<OrderLineCreatedEvent> handlerEvent)
+        private void OrderLineCreatedEventHandler(HandlerEvent<OrderLineCreated> handlerEvent)
         {
             var orderLine = new OrderLine();
             handlerEvent.ForwardTo(orderLine);
             _orderLines.Add(orderLine);
         }
 
-        private void OrderLineRemovedEventHandler(HandlerEvent<OrderLineRemovedEvent> handlerEvent)
+        private void OrderLineRemovedEventHandler(HandlerEvent<OrderLineRemoved> handlerEvent)
         {
             _orderLines.Remove(handlerEvent.Event.OrderLineIdentity);
         }

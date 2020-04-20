@@ -3,9 +3,9 @@ using DDD.Core.OrderManagement.Orders.Identities;
 
 namespace DDD.Core.OrderManagement.Orders.Events
 {
-    public class OrderLineQuantityAdjustedEvent : Event
+    public class OrderLineQuantityAdjusted : Event
     {
-        public OrderLineQuantityAdjustedEvent(OrderIdentity orderIdentity, OrderLineIdentity orderLineIdentity, int quantity)
+        public OrderLineQuantityAdjusted(OrderIdentity orderIdentity, OrderLineIdentity orderLineIdentity, int quantity)
         {
             OrderIdentity = orderIdentity;
             OrderLineIdentity = orderLineIdentity;

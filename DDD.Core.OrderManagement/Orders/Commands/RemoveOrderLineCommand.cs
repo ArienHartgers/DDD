@@ -10,7 +10,8 @@ namespace DDD.Core.OrderManagement.Orders.Commands
         {
             if (order.FindOrderLine(orderLineIdentity) != null)
             {
-                order.ApplyChange(new OrderLineRemovedEvent(
+                order.ApplyChange(new OrderLineRemoved(
+                    order.Identity,
                     orderLineIdentity));
             }
         }

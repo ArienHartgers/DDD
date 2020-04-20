@@ -2,6 +2,11 @@
 {
     public class UnknownEvent : Event
     {
-        public string X { get; set; } = null!;
+        public UnknownEvent(string x)
+        {
+            X = x;
+        }
+
+        public string X { get; }
     }
 }

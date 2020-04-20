@@ -11,9 +11,15 @@ namespace DDD.App
         {
             switch (@event)
             {
-                case Core.OrderManagement.Orders.Events.OrderCreated orderCreated:
+                case Core.OrderManagement.Orders.Events.OrderCreated e:
                     return new DDD.App.Events.OrderCreated(
-                        orderCreated.OrderIdentity.Identity);
+                        e.OrderIdentity.Identity);
+
+                case Core.OrderManagement.Orders.Events.OrderCustomerNameChanged e:
+                    return new DDD.App.Events.OrderCustomerNameChanged(
+                        e.OrderIdentity.Identity, 
+                        e.CustomerName);
+
                 default: throw new Exception("Unknown event type");
             }
         }
@@ -24,8 +30,16 @@ namespace DDD.App
             {
                 case DDD.App.Events.OrderCreated orderCreated:
                     return new Core.OrderManagement.Orders.Events.OrderCreated(
-                        OrderIdentity.Parse(orderCreated.OrderIdentity),
+                        OrderIdentity.Create(orderCreated.OrderIdentity),
                         CustomerIdentity.New());
+
+                case DDD.App.Events.OrderCustomerNameChanged e:
+                    return new Core.OrderManagement.Orders.Events.OrderCustomerNameChanged(
+                        OrderIdentity.Create(e.OrderIdentity), 
+                        e.CustomerName);
+
+
+
                 default: throw new Exception("Unknown event type");
             }
         }

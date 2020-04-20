@@ -15,10 +15,7 @@ namespace DDD.Core.OrderManagement.Orders.Commands
 
             if (order.CustomerName != customerName)
             {
-                order.ApplyChange(new OrderCustomerNameChangedEvent
-                {
-                    CustomerName = customerName,
-                });
+                order.ApplyChange(new OrderCustomerNameChanged(order.Identity, customerName));
             }
         }
     }

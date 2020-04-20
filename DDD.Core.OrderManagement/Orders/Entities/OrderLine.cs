@@ -10,14 +10,14 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 
         public OrderLine()
         {
-            RegisterEvent<OrderLineCreatedEvent>(handlerEvent =>
+            RegisterEvent<OrderLineCreated>(handlerEvent =>
             {
                 _identity = handlerEvent.Event.OrderLineIdentity;
                 ProductIdentity = handlerEvent.Event.ProductIdentity;
                 Quantity = handlerEvent.Event.Quantity;
             });
 
-            RegisterEvent<OrderLineQuantityAdjustedEvent>(handlerEvent =>
+            RegisterEvent<OrderLineQuantityAdjusted>(handlerEvent =>
             {
                 Quantity = handlerEvent.Event.Quantity;
             });

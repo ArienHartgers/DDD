@@ -13,7 +13,7 @@ namespace DDD.Core.OrderManagement.Orders.Commands
             var itemLine = order.OrderLines.Entities.FirstOrDefault(ol => ol.ProductIdentity == productIdentity);
             if (itemLine != null)
             {
-                order.ApplyChange(new OrderLineQuantityAdjustedEvent(
+                order.ApplyChange(new OrderLineQuantityAdjusted(
                     order.Identity,
                     itemLine.Identity,
                     itemLine.Quantity + quantity));
@@ -22,7 +22,7 @@ namespace DDD.Core.OrderManagement.Orders.Commands
             }
 
             var identity = OrderLineIdentity.NextIdentity(order.OrderLines.MaxIdentity);
-            order.ApplyChange(new OrderLineCreatedEvent(identity, productIdentity, quantity));
+            order.ApplyChange(new OrderLineCreated(order.Identity, identity, productIdentity, quantity));
 
             return identity;
         }
