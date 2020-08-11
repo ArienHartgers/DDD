@@ -21,7 +21,7 @@ namespace DDD.Core.OrderManagement.Orders.Commands
                 return itemLine.Identity;
             }
 
-            var identity = OrderLineIdentity.NextIdentity(order.OrderLines.MaxIdentity);
+            var identity = OrderLineIdentity.NextIdentity(order.OrderLines.LastIdentity);
             order.ApplyChange(new OrderLineCreated(order.Identity, identity, productIdentity, quantity));
 
             return identity;

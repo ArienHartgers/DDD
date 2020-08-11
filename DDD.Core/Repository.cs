@@ -57,7 +57,7 @@ namespace DDD.Core
         {
             IAggregateLoader loader = aggregate;
             var changes = loader.GetUncommittedChanges();
-            var streamName = aggregate.Identity.ToString();
+            var streamName = aggregate.GetIdentity().ToString();
             _eventStore.SaveEvents(streamName, aggregate.Version, changes.ToArray());
             loader.MarkChangesAsCommitted();
         }

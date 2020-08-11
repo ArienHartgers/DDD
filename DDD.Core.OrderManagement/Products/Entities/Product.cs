@@ -7,7 +7,7 @@ namespace DDD.Core.OrderManagement.Products.Entities
 {
     public class Product : AggregateRoot<ProductIdentity>
     {
-        private Product(TypedEvent<ProductCreated> initialEvent)
+        private Product(HandlerEvent<ProductCreated> initialEvent)
         {
             Created = initialEvent.EventDateTime;
             LastUpdate = initialEvent.EventDateTime;
@@ -17,13 +17,15 @@ namespace DDD.Core.OrderManagement.Products.Entities
             RegisterEvent<ProductNameChanged>(ProductNameChangedEventHandler);
         }
 
-        public override ProductIdentity Identity { get; }
+        public ProductIdentity Identity { get; }
 
         public DateTimeOffset Created { get; }
 
         public DateTimeOffset LastUpdate { get; private set; }
         
         public ProductName ProductName { get; private set; }
+
+        public override ProductIdentity GetIdentity() => Identity;
 
         private void ProductNameChangedEventHandler(HandlerEvent<ProductNameChanged> handlerEvent)
         {

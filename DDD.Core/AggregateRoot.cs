@@ -5,7 +5,6 @@ using System.Linq;
 namespace DDD.Core
 {
     public abstract class AggregateRoot<TIdentity> : Entity<TIdentity>, IAggregateLoader
-        where TIdentity : IIdentity
     {
         private static bool _isChecked = false;
         private readonly List<LoadedEvent> _changes = new List<LoadedEvent>();

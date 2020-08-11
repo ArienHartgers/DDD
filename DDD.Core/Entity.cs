@@ -4,13 +4,12 @@ using System.Collections.Generic;
 namespace DDD.Core
 {
     public abstract class Entity<TIdentity> : IEventApplier
-        where TIdentity : IIdentity
     {
 
         private readonly Dictionary<Type, MessageHandler>
             _messageHandlerDictionary = new Dictionary<Type, MessageHandler>();
 
-        public abstract TIdentity Identity { get; }
+        public abstract TIdentity GetIdentity();
 
         bool IEventApplier.ProcessMessage(LoadedEvent loadedEvent)
         {

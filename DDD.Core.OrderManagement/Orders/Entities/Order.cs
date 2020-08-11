@@ -25,7 +25,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
             RegisterEvent<OrderLineQuantityAdjusted>(e => e.ForwardTo(_orderLines.Get(e.Event.OrderLineIdentity)));
         }
 
-        public override OrderIdentity Identity { get; }
+        public OrderIdentity Identity { get; }
     
         public DateTimeOffset Created { get; private set; }
 
@@ -36,6 +36,8 @@ namespace DDD.Core.OrderManagement.Orders.Entities
         public string CustomerName { get; private set; }
 
         public IEntityCollection<OrderLine, OrderLineIdentity> OrderLines => _orderLines;
+
+        public override OrderIdentity GetIdentity() => Identity;
 
         public OrderLine? FindOrderLine(OrderLineIdentity id)
         {
@@ -50,8 +52,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 
         private void OrderLineCreatedEventHandler(HandlerEvent<OrderLineCreated> handlerEvent)
         {
-            var orderLine = new OrderLine();
-            handlerEvent.ForwardTo(orderLine);
+            var orderLine = new OrderLine(handlerEvent);
             _orderLines.Add(orderLine);
         }
 

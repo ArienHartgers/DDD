@@ -9,17 +9,17 @@ namespace DDD.Core
     {
 
         private readonly Dictionary<TIdentity, TEntity> _entities = new Dictionary<TIdentity, TEntity>();
-        private TIdentity? _maxIdentity = null;
+        private TIdentity _lastIdentity = null!;
 
         public IReadOnlyCollection<TEntity> Entities => _entities.Values;
 
-        public TIdentity? MaxIdentity => _maxIdentity;
+        public TIdentity LastIdentity => _lastIdentity;
 
         public void Add(TEntity entity)
         {
-            _entities.Add(entity.Identity, entity);
+            _entities.Add(entity.GetIdentity(), entity);
 
-            _maxIdentity = entity.Identity;
+            _lastIdentity = entity.GetIdentity();
         }
 
         public void Remove(TIdentity identity)
