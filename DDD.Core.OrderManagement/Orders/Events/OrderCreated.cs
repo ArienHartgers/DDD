@@ -14,7 +14,5 @@ namespace DDD.Core.OrderManagement.Orders.Events
 
         public OrderIdentity OrderIdentity { get; }
         public CustomerIdentity CustomerIdentity { get; }
-
-        
     }
 }

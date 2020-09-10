@@ -1,61 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace DDD.Core
 {
-    public abstract class Entity<TIdentity> : IEventApplier
+    public abstract class Entity<TIdentity> : EntityBase<TIdentity>, IEntityModifier
     {
+        private IEntityModifier? _root;
 
-        private readonly Dictionary<Type, MessageHandler>
-            _messageHandlerDictionary = new Dictionary<Type, MessageHandler>();
-
-        public abstract TIdentity GetIdentity();
-
-        bool IEventApplier.ProcessMessage(LoadedEvent loadedEvent)
+        protected Entity(IEntityModifier root)
         {
-            if (_messageHandlerDictionary.TryGetValue(loadedEvent.Data.GetType(), out var handler))
-            {
-                handler.Execute(loadedEvent);
-                return true;
-            }
-
-            return false;
+            _root = root;
         }
 
-        protected void RegisterEvent<TEvent>(Action<HandlerEvent<TEvent>> callback)
-            where TEvent : Event
+        protected void ApplyChange(Event @event)
         {
-            var handler = new MessageHandler<TEvent>(callback);
-
-            _messageHandlerDictionary.Add(typeof(TEvent), handler);
-        }
-
-        private abstract class MessageHandler
-        {
-            internal abstract void Execute(LoadedEvent loadedEvent);
-        }
-
-        private class MessageHandler<TEvent> : MessageHandler
-            where TEvent : Event
-        {
-            private readonly Action<HandlerEvent<TEvent>> _callback;
-
-            public MessageHandler(Action<HandlerEvent<TEvent>> callback)
+            if (_root == null)
             {
-                _callback = callback;
+                throw new Exception("Entity is marked as removed");
             }
 
-            internal override void Execute(LoadedEvent loadedEvent)
-            {
-                if (loadedEvent is HandlerEvent<TEvent> he)
-                {
-                    _callback(he);
-                }
-                else if (loadedEvent.Data is TEvent @event)
-                {
-                    _callback(new HandlerEvent<TEvent>(loadedEvent.EventDateTime, @event));
-                }
-            }
+            _root.ApplyChange(@event);
+        }
+
+        void IEntityModifier.ApplyChange(Event @event)
+        {
+            ApplyChange(@event);
+        }
+
+        void IEntityModifier.MarkAsRemoved()
+        {
+            _root = null;
         }
     }
 }

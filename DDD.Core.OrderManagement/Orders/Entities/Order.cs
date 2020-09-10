@@ -4,7 +4,7 @@ using DDD.Core.OrderManagement.Orders.Identities;
 
 namespace DDD.Core.OrderManagement.Orders.Entities
 {
-    public class Order : AggregateRoot<OrderIdentity>
+    public partial class Order : AggregateRoot<OrderIdentity>
     {
         private readonly EntityCollection<OrderLine, OrderLineIdentity> _orderLines = new EntityCollection<OrderLine, OrderLineIdentity>();
 
@@ -27,7 +27,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 
         public OrderIdentity Identity { get; }
     
-        public DateTimeOffset Created { get; private set; }
+        public DateTimeOffset Created { get; }
 
         public CustomerIdentity CustomerIdentity { get; }
 
@@ -35,14 +35,9 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 
         public string CustomerName { get; private set; }
 
-        public IEntityCollection<OrderLine, OrderLineIdentity> OrderLines => _orderLines;
+        public IEntityCollection<OrderLine, OrderLineIdentity> Lines => _orderLines;
 
         public override OrderIdentity GetIdentity() => Identity;
-
-        public OrderLine? FindOrderLine(OrderLineIdentity id)
-        {
-            return _orderLines.Find(id);
-        }
 
         private void OrderCustomerNameChangedEventHandler(HandlerEvent<OrderCustomerNameChanged> handlerEvent)
         {
@@ -52,7 +47,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 
         private void OrderLineCreatedEventHandler(HandlerEvent<OrderLineCreated> handlerEvent)
         {
-            var orderLine = new OrderLine(handlerEvent);
+            var orderLine = new OrderLine(this, handlerEvent);
             _orderLines.Add(orderLine);
         }
 
@@ -60,6 +55,5 @@ namespace DDD.Core.OrderManagement.Orders.Entities
         {
             _orderLines.Remove(handlerEvent.Event.OrderLineIdentity);
         }
-
     }
 }

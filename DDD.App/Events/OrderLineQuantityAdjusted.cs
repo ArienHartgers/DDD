@@ -3,7 +3,7 @@ using DDD.Core.OrderManagement.Orders.Identities;
 
 namespace DDD.App.Events
 {
-    public class OrderLineQuantityAdjusted
+    public class OrderLineQuantityAdjusted : IDomainEvent
     {
         public OrderLineQuantityAdjusted(string orderIdentity, string orderLineIdentity, int quantity)
         {

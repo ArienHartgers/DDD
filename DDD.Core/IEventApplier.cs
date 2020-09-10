@@ -3,6 +3,5 @@
     public interface IEventApplier
     {
         bool ProcessMessage(LoadedEvent loadedEvent);
-
     }
 }

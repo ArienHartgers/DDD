@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace DDD.Core
@@ -7,34 +8,37 @@ namespace DDD.Core
         where TIdentity : class, IIdentity
         where TEntity : Entity<TIdentity>
     {
-
         private readonly Dictionary<TIdentity, TEntity> _entities = new Dictionary<TIdentity, TEntity>();
-        private TIdentity _lastIdentity = null!;
 
         public IReadOnlyCollection<TEntity> Entities => _entities.Values;
 
-        public TIdentity LastIdentity => _lastIdentity;
+        public TIdentity? LastIdentity { get; private set; }
 
         public void Add(TEntity entity)
         {
             _entities.Add(entity.GetIdentity(), entity);
 
-            _lastIdentity = entity.GetIdentity();
+            LastIdentity = entity.GetIdentity();
         }
 
         public void Remove(TIdentity identity)
         {
-            _entities.Remove(identity);
+            if (_entities.TryGetValue(identity, out var entity))
+            {
+                IEntityModifier changer = entity;
+                changer.MarkAsRemoved();
+                _entities.Remove(identity);
+            }
         }
 
-        public bool TryFind(TIdentity identity, out TEntity entity)
+        public bool TryGet(TIdentity identity, out TEntity entity)
         {
             return _entities.TryGetValue(identity, out entity);
         }
 
         public TEntity? Find(TIdentity identity)
         {
-            if (TryFind(identity, out var entity))
+            if (TryGet(identity, out var entity))
             {
                 return entity;
             }
@@ -44,7 +48,7 @@ namespace DDD.Core
 
         public TEntity Get(TIdentity identity)
         {
-            if (TryFind(identity, out var entity))
+            if (TryGet(identity, out var entity))
             {
                 return entity;
             }
@@ -58,11 +62,21 @@ namespace DDD.Core
             return @event =>
             {
                 var identity = selector(@event.Event);
-                if (TryFind(identity, out var entity))
+                if (TryGet(identity, out var entity))
                 {
                     @event.ForwardTo(entity);
                 }
             };
+        }
+
+        public IEnumerator<TEntity> GetEnumerator()
+        {
+            return _entities.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _entities.Values.GetEnumerator();
         }
     }
 }

@@ -6,20 +6,19 @@ namespace DDD.Core
     {
         void SaveEvents(string streamName, int expectedVersion, IEnumerable<LoadedEvent> changes);
 
-        GetStreamEventsResult GetStreamEvents(string streamName);
-    }
+        StreamEvents GetStreamEvents(string streamName);
 
-    public class GetStreamEventsResult
-    {
-        public GetStreamEventsResult(int version, IReadOnlyCollection<LoadedEvent> events)
+        public class StreamEvents
         {
-            Version = version;
-            Events = events;
+            public StreamEvents(int version, IReadOnlyCollection<LoadedEvent> events)
+            {
+                Version = version;
+                Events = events;
+            }
+
+            public int Version { get; }
+
+            public IReadOnlyCollection<LoadedEvent> Events { get; }
         }
-
-        public int Version { get; }
-
-        public IReadOnlyCollection<LoadedEvent> Events { get; }
     }
-
 }

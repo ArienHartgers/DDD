@@ -5,14 +5,12 @@ namespace DDD.Core.OrderManagement.Products.Identities
 {
     public class ProductIdentity : IdentityValueObject
     {
-        internal ProductIdentity(string guid)
+        internal ProductIdentity(string value)
         {
-            Name = guid;
+            Identity = value;
         }
 
-        public string Name { get; }
-
-        public override string Identity => Name;//$"Product_{ProductGuid}";
+        public override string Identity { get; }
 
         public static ProductIdentity Parse(string s)
         {
@@ -36,7 +34,7 @@ namespace DDD.Core.OrderManagement.Products.Identities
 
         protected override IEnumerable<object> GetEqualityComponents()
         {
-            yield return Name;//ProductGuid;
+            yield return Identity;
         }
     }
 }

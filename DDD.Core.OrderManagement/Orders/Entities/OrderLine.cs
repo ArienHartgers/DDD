@@ -4,18 +4,19 @@ using DDD.Core.OrderManagement.Products.Identities;
 
 namespace DDD.Core.OrderManagement.Orders.Entities
 {
-    public class OrderLine : Entity<OrderLineIdentity>
+    public partial class OrderLine : Entity<OrderLineIdentity>
     {
-        public OrderLine(HandlerEvent<OrderLineCreated> handlerEvent)
-        {
-            Identity = handlerEvent.Event.OrderLineIdentity;
-            ProductIdentity = handlerEvent.Event.ProductIdentity;
-            Quantity = handlerEvent.Event.Quantity;
+        private readonly Order _order;
 
-            RegisterEvent<OrderLineQuantityAdjusted>(handlerEvent =>
-            {
-                Quantity = handlerEvent.Event.Quantity;
-            });
+        public OrderLine(Order order, HandlerEvent<OrderLineCreated> initialEvent)
+            : base(order)
+        {
+            _order = order;
+            Identity = initialEvent.Event.OrderLineIdentity;
+            ProductIdentity = initialEvent.Event.ProductIdentity;
+            Quantity = initialEvent.Event.Quantity;
+
+            RegisterEvent<OrderLineQuantityAdjusted>(ProcessOrderLineQuantityAdjusted);
         }
 
         public OrderLineIdentity Identity { get; }
@@ -23,5 +24,10 @@ namespace DDD.Core.OrderManagement.Orders.Entities
         public int Quantity { get; private set; }
 
         public override OrderLineIdentity GetIdentity() => Identity;
+
+        private void ProcessOrderLineQuantityAdjusted(HandlerEvent<OrderLineQuantityAdjusted> handlerEvent)
+        {
+            Quantity = handlerEvent.Event.Quantity;
+        }
     }
 }

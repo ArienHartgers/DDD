@@ -5,7 +5,7 @@ namespace DDD.Core.OrderManagement.BDD
 {
     public class TestEventStore : IEventStore
     {
-        private readonly GetStreamEventsResult _noEvents = new GetStreamEventsResult(0, new List<LoadedEvent>(0));
+        private readonly IEventStore.StreamEvents _noEvents = new IEventStore.StreamEvents(0, new List<LoadedEvent>(0));
         private readonly Dictionary<string, List<LoadedEvent>> _streams = new Dictionary<string, List<LoadedEvent>>();
 
         public void AddTestEvents(string streamName, params LoadedEvent[] changes)
@@ -39,11 +39,11 @@ namespace DDD.Core.OrderManagement.BDD
             loadedEvents.AddRange(changes);
         }
 
-        GetStreamEventsResult IEventStore.GetStreamEvents(string streamName)
+        IEventStore.StreamEvents IEventStore.GetStreamEvents(string streamName)
         {
             if (_streams.TryGetValue(streamName, out var loadedEvents))
             {
-                return new GetStreamEventsResult(loadedEvents.Count, loadedEvents);
+                return new IEventStore.StreamEvents(loadedEvents.Count, loadedEvents);
             }
 
             return _noEvents;

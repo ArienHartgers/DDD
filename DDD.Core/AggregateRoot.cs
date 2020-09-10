@@ -4,10 +4,12 @@ using System.Linq;
 
 namespace DDD.Core
 {
-    public abstract class AggregateRoot<TIdentity> : Entity<TIdentity>, IAggregateLoader
+    public abstract class AggregateRoot<TIdentity> : EntityBase<TIdentity>, IAggregateLoader, IEntityModifier
     {
         private static bool _isChecked = false;
         private readonly List<LoadedEvent> _changes = new List<LoadedEvent>();
+        private bool _isRemoved = false;
+
 
         public int Version { get; internal set; }
 
@@ -47,11 +49,26 @@ namespace DDD.Core
             _changes.Add(@event);
         }
 
-        public void ApplyChange(Event @event)
+        protected void ApplyChange(Event @event)
         {
+            if (_isRemoved)
+            {
+                throw new Exception("Aggregate is marked as removed");
+            }
+
             ApplyChange(
                 new LoadedEvent(DateTimeOffset.Now, @event),
                 true);
+        }
+
+        void IEntityModifier.ApplyChange(Event @event)
+        {
+            ApplyChange(@event);
+        }
+
+        void IEntityModifier.MarkAsRemoved()
+        {
+            _isRemoved = true;
         }
 
         // push atomic aggregate changes to local history for further processing (EventStore.SaveEvents)

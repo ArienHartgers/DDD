@@ -1,9 +1,9 @@
 ﻿using System.Text.Json;
+using DDD.App.Events;
+using DDD.Core;
 using DDD.Core.OrderManagement.BDD;
 using DDD.Core.OrderManagement.Orders;
-using DDD.Core.OrderManagement.Orders.Commands;
 using DDD.Core.OrderManagement.Products;
-using DDD.Core.OrderManagement.Products.Commands;
 using DDD.Core.OrderManagement.Products.Identities;
 using DDD.Core.OrderManagement.Products.ValueObjects;
 
@@ -13,6 +13,8 @@ namespace DDD.App
     {
         static void Main()
         {
+
+            var eventsConverter = new EventsConverter();
 
             //var e = new Core.OrderManagement.Orders.Events.OrderCreated(OrderIdentity.New());
             //System.Console.WriteLine(JsonSerializer.Serialize(e, new JsonSerializerOptions { WriteIndented = true }));
@@ -30,14 +32,14 @@ namespace DDD.App
 
             //return;
 
-            var eventStore = new TestEventStore();
+            IEventStore eventStore = new TestEventStore();
             var productRepository = new ProductRepository(eventStore);
 
             var product = productRepository.Create(ProductName.Create("Brood"));
 
             productRepository.Save(product);
 
-            product.ChangeProductName(ProductName.Create("Boterham"));
+            product.ChangeName(ProductName.Create("Boterham"));
             productRepository.Save(product);
 
 
@@ -45,50 +47,77 @@ namespace DDD.App
             
             var product2 = productRepository2.Get(product.Identity);
 
-            System.Console.WriteLine(JsonSerializer.Serialize(product, new JsonSerializerOptions { WriteIndented = true }));
-            System.Console.WriteLine(JsonSerializer.Serialize(product2, new JsonSerializerOptions { WriteIndented = true }));
+            //System.Console.WriteLine(JsonSerializer.Serialize(product, new JsonSerializerOptions { WriteIndented = true }));
+            //System.Console.WriteLine(JsonSerializer.Serialize(product2, new JsonSerializerOptions { WriteIndented = true }));
 
 
 
             var orderRepository = new OrderRepository(eventStore);
 
-            var order = orderRepository.Create();
+            var order = orderRepository.CreateOrder();
+
+            var faultyLine = order.CreateOrderLine(ProductIdentity.Parse("Fout"), 1);
+            faultyLine.Remove();
+            
+            
+            order.CreateOrderLine(ProductIdentity.Parse("Brood"), 1);
+            order.CreateOrderLine(ProductIdentity.Parse("Boter"), 1);
+            order.CreateOrderLine(ProductIdentity.Parse("Pindakaas"), 1);
+            order.CreateOrderLine(ProductIdentity.Parse("Boterhamworst"), 1);
+
+
 
             orderRepository.Save(order);
 
             var order2 = orderRepository.Get(order.Identity);
 
+            var streamEvents = eventStore.GetStreamEvents(product.Identity.Identity);
+            foreach (var loadedEvent in streamEvents.Events)
+            {
+                if (loadedEvent.Data is Event @event)
+                {
+                    if (eventsConverter.TryConvert(@event, out var domainEvent))
+                    {
+                        System.Console.WriteLine($"{loadedEvent.EventDateTime} {domainEvent.GetType().Name}");
+                        System.Console.WriteLine(JsonSerializer.Serialize(domainEvent, domainEvent.GetType(), new JsonSerializerOptions { WriteIndented = true }));
+                        //System.Console.WriteLine(JsonSerializer.Serialize(@event, @event.GetType(), new JsonSerializerOptions { WriteIndented = true }));
+                    }
+                }
+            }
 
-            order.ChangeOrderCustomerName("Ilonka");
+
+            order.ChangeCustomerName("Ilonka");
 
 
 
 
 
-            var orderLineIdentity = order.CreateOrderLine(ProductIdentity.Parse( "Brood"), 1);
+            var orderLine = order.CreateOrderLine(ProductIdentity.Parse( "Brood"), 1);
 
-            System.Console.WriteLine(JsonSerializer.Serialize(order, new JsonSerializerOptions { WriteIndented = true }));
+            //System.Console.WriteLine(JsonSerializer.Serialize(order, new JsonSerializerOptions { WriteIndented = true }));
 
             orderRepository.Save(order);
 
+            var orderLine1 = order.Lines.Get(orderLine.Identity);
+            orderLine1.AdjustQuantity(10);
 
-            order.AdjustOrderLineQuantity(orderLineIdentity, 10);
 
-
-            System.Console.WriteLine(JsonSerializer.Serialize(order, new JsonSerializerOptions { WriteIndented = true }));
+            //System.Console.WriteLine(JsonSerializer.Serialize(order, new JsonSerializerOptions { WriteIndented = true }));
 
             orderRepository.Save(order);
 
+            var orderLine2 = order.Lines.Get(orderLine.Identity);
+            orderLine2.AdjustQuantity(10);
 
-            order.AdjustOrderLineQuantity(orderLineIdentity, 10);
             orderRepository.Save(order);
 
+            var orderLine3 = order.Lines.Get(orderLine.Identity);
+            orderLine3.Remove();
 
-            order.RemoveOrderLine(orderLineIdentity);
             order.CreateOrderLine(ProductIdentity.Parse("Brood2"), 1);
 
             orderRepository.Save(order);
-            System.Console.WriteLine(JsonSerializer.Serialize(order, new JsonSerializerOptions { WriteIndented = true }));
+            //System.Console.WriteLine(JsonSerializer.Serialize(order, new JsonSerializerOptions { WriteIndented = true }));
 
         }
     }

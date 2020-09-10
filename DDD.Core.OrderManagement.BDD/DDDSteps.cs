@@ -4,7 +4,6 @@ using System.Linq;
 using DDD.Core.OrderManagement.Orders;
 using TechTalk.SpecFlow;
 using DDD.Core.OrderManagement.Orders.Events;
-using DDD.Core.OrderManagement.Orders.Commands;
 using DDD.Core.OrderManagement.Orders.Entities;
 using DDD.Core.OrderManagement.Orders.Identities;
 using DDD.Core.OrderManagement.Products.Identities;
@@ -67,14 +66,16 @@ namespace DDD.Core.OrderManagement.BDD
         {
             var orderLineIdentity = OrderLineIdentity.Create(id);
             var order = GetOrder();
-            order.AdjustOrderLineQuantity(orderLineIdentity, quantity);
+            var orderLine = order.Lines.Get(orderLineIdentity);
+            orderLine.AdjustQuantity(quantity);
         }
 
         [When(@"I remove line with identity (.*) from order")]
         public void WhenIRemoveLineWithIdentityFromOrder(string id)
         {
             var order = GetOrder();
-            order.RemoveOrderLine(OrderLineIdentity.Create(id));
+            var orderLine = order.Lines.Get(OrderLineIdentity.Create(id));
+            orderLine.Remove();
         }
 
         [Then("No Result is expected")]
@@ -172,7 +173,7 @@ namespace DDD.Core.OrderManagement.BDD
 
             var orderRepository = new OrderRepository(_eventStore);
 
-            _order = orderRepository.Create();
+            _order = orderRepository.CreateOrder();
 
             return _order;
         }

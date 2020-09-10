@@ -5,9 +5,9 @@ using DDD.Core.OrderManagement.Products.ValueObjects;
 
 namespace DDD.Core.OrderManagement.Products.Entities
 {
-    public class Product : AggregateRoot<ProductIdentity>
+    public partial class Product : AggregateRoot<ProductIdentity>
     {
-        private Product(HandlerEvent<ProductCreated> initialEvent)
+        private Product(TypedEvent<ProductCreated> initialEvent)
         {
             Created = initialEvent.EventDateTime;
             LastUpdate = initialEvent.EventDateTime;
@@ -26,6 +26,7 @@ namespace DDD.Core.OrderManagement.Products.Entities
         public ProductName ProductName { get; private set; }
 
         public override ProductIdentity GetIdentity() => Identity;
+
 
         private void ProductNameChangedEventHandler(HandlerEvent<ProductNameChanged> handlerEvent)
         {

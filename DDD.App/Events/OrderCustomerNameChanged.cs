@@ -1,6 +1,6 @@
 ﻿namespace DDD.App.Events
 {
-    public class OrderCustomerNameChanged 
+    public class OrderCustomerNameChanged : IDomainEvent
     {
         public OrderCustomerNameChanged(string orderIdentity, string customerName)
         {

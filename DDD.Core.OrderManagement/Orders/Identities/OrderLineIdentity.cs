@@ -20,9 +20,10 @@ namespace DDD.Core.OrderManagement.Orders.Identities
             return new OrderLineIdentity(lineId);
         }
 
-        public static OrderLineIdentity NextIdentity(OrderLineIdentity lastOrderLineIdentity)
+        public static OrderLineIdentity NextIdentity(OrderLineIdentity? lastOrderLineIdentity)
         {
-            return new OrderLineIdentity(lastOrderLineIdentity.LineId + 1);
+            var lastLineId = lastOrderLineIdentity?.LineId ?? 0;
+            return new OrderLineIdentity( lastLineId+ 1);
         }
 
         public static OrderLineIdentity Create(string id)

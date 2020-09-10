@@ -10,7 +10,7 @@ namespace DDD.Core.OrderManagement.Orders
         {
         }
 
-        public Order Create()
+        public Order CreateOrder()
         {
             return Create(new OrderCreated(OrderIdentity.New(), CustomerIdentity.New()));
         }
