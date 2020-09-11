@@ -9,10 +9,5 @@ namespace DDD.Core.OrderManagement.Orders
         public OrderRepository(IEventStore eventStore) : base(eventStore)
         {
         }
-
-        public Order CreateOrder()
-        {
-            return Create(new OrderCreated(OrderIdentity.New(), CustomerIdentity.New()));
-        }
     }
 }

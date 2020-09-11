@@ -15,15 +15,16 @@ namespace DDD.Core
             _eventStore = eventStore;
         }
 
-        protected TAggregateRoot Create(Event @event)
-        {
-            var loadedEvent = new LoadedEvent(DateTimeOffset.Now, @event);
-            TAggregateRoot aggregate = CreateInternal(loadedEvent);
 
-            aggregate.ApplyInitialEvent(loadedEvent);
+        //protected TAggregateRoot Create(Event @event)
+        //{
+        //    var loadedEvent = new LoadedEvent(DateTimeOffset.Now, @event);
+        //    TAggregateRoot aggregate = CreateInternal(loadedEvent);
 
-            return aggregate;
-        }
+        //    aggregate.ApplyInitialEvent(loadedEvent);
+
+        //    return aggregate;
+        //}
 
         public TAggregateRoot Get(IIdentity identity)
         {
@@ -57,9 +58,12 @@ namespace DDD.Core
         {
             IAggregateLoader loader = aggregate;
             var changes = loader.GetUncommittedChanges();
-            var streamName = aggregate.GetIdentity().ToString();
-            _eventStore.SaveEvents(streamName, aggregate.Version, changes.ToArray());
-            loader.MarkChangesAsCommitted();
+            if (changes.Any())
+            {
+                var streamName = aggregate.GetIdentity().ToString();
+                _eventStore.SaveEvents(streamName, aggregate.Version, changes);
+                loader.MarkChangesAsCommitted();
+            }
         }
 
         private TAggregateRoot CreateInternal(LoadedEvent firstLoadedEvent)

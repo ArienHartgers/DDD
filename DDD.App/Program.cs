@@ -1,9 +1,14 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Linq;
+using System.Text.Json;
 using DDD.App.Events;
 using DDD.Core;
 using DDD.Core.OrderManagement.BDD;
 using DDD.Core.OrderManagement.Orders;
+using DDD.Core.OrderManagement.Orders.Entities;
+using DDD.Core.OrderManagement.Orders.Identities;
 using DDD.Core.OrderManagement.Products;
+using DDD.Core.OrderManagement.Products.Entities;
 using DDD.Core.OrderManagement.Products.Identities;
 using DDD.Core.OrderManagement.Products.ValueObjects;
 
@@ -35,12 +40,13 @@ namespace DDD.App
             IEventStore eventStore = new TestEventStore();
             var productRepository = new ProductRepository(eventStore);
 
-            var product = productRepository.Create(ProductName.Create("Brood"));
+            var product = Product.Create(DateTimeOffset.Now, ProductName.Create("Brood"));
 
             productRepository.Save(product);
 
             product.ChangeName(ProductName.Create("Boterham"));
             productRepository.Save(product);
+
 
 
             var productRepository2 = new ProductRepository(eventStore);
@@ -52,9 +58,11 @@ namespace DDD.App
 
 
 
-            var orderRepository = new OrderRepository(eventStore);
 
-            var order = orderRepository.CreateOrder();
+            var order = Order.Create(
+                DateTimeOffset.Now,
+                OrderIdentity.New(), 
+                CustomerIdentity.New());
 
             var faultyLine = order.CreateOrderLine(ProductIdentity.Parse("Fout"), 1);
             faultyLine.Remove();
@@ -65,8 +73,14 @@ namespace DDD.App
             order.CreateOrderLine(ProductIdentity.Parse("Pindakaas"), 1);
             order.CreateOrderLine(ProductIdentity.Parse("Boterhamworst"), 1);
 
+            var pindaKaasOrderLine = order.Lines.Get(ProductIdentity.Parse("Pindakaas"));
+            pindaKaasOrderLine.Remove();
+
+            var boterOrderLine = order.Lines.Get(ProductIdentity.Parse("Boter"));
+            boterOrderLine.AdjustQuantity(3);
 
 
+            var orderRepository = new OrderRepository(eventStore);
             orderRepository.Save(order);
 
             var order2 = orderRepository.Get(order.Identity);

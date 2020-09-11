@@ -22,7 +22,7 @@ namespace DDD.Core.OrderManagement.Products.Entities
         public DateTimeOffset Created { get; }
 
         public DateTimeOffset LastUpdate { get; private set; }
-        
+
         public ProductName ProductName { get; private set; }
 
         public override ProductIdentity GetIdentity() => Identity;

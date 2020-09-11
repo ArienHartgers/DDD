@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DDD.App", "DDD.App\DDD.App.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DDD.Core.OrderManagement.BDD", "DDD.Core.OrderManagement.BDD\DDD.Core.OrderManagement.BDD.csproj", "{30DEB821-5009-4DB1-A1B6-C52F1D05CA13}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDD.Adapters.Store", "DDD.Adapters.Store\DDD.Adapters.Store.csproj", "{7968E135-D6EF-4EA9-87F9-A85600F03BBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DDD.Adapters.Store", "DDD.Adapters.Store\DDD.Adapters.Store.csproj", "{7968E135-D6EF-4EA9-87F9-A85600F03BBA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDD.Core.OrderManagement.Tests", "DDD.Core.OrderManagement.Tests\DDD.Core.OrderManagement.Tests.csproj", "{28DDDC83-2469-4853-A315-BEE73EBA44EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{7968E135-D6EF-4EA9-87F9-A85600F03BBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7968E135-D6EF-4EA9-87F9-A85600F03BBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7968E135-D6EF-4EA9-87F9-A85600F03BBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28DDDC83-2469-4853-A315-BEE73EBA44EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28DDDC83-2469-4853-A315-BEE73EBA44EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28DDDC83-2469-4853-A315-BEE73EBA44EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28DDDC83-2469-4853-A315-BEE73EBA44EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

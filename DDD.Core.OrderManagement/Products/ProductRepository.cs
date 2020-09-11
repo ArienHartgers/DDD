@@ -11,9 +11,5 @@ namespace DDD.Core.OrderManagement.Products
         {
         }
 
-        public Product Create(ProductName productName)
-        {
-            return Create(new ProductCreated(ProductIdentity.New(), productName));
-        }
     }
 }

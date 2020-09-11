@@ -173,7 +173,10 @@ namespace DDD.Core.OrderManagement.BDD
 
             var orderRepository = new OrderRepository(_eventStore);
 
-            _order = orderRepository.CreateOrder();
+            _order = Order.Create(
+                DateTimeOffset.Now,
+                OrderIdentity.New(), 
+                CustomerIdentity.New());
 
             return _order;
         }

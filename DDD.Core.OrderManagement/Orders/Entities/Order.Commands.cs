@@ -8,6 +8,15 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 {
     public partial class Order
     {
+        public static Order Create(DateTimeOffset now, OrderIdentity orderIdentity, CustomerIdentity customerIdentity)
+        {
+            return CreateWithEvent<Order, OrderCreated>(
+                now,
+                new OrderCreated(
+                    orderIdentity,
+                    customerIdentity));
+        }
+
         public void ChangeCustomerName(string customerName)
         {
             if (string.IsNullOrEmpty(customerName))

@@ -6,7 +6,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 {
     public partial class Order : AggregateRoot<OrderIdentity>
     {
-        private readonly EntityCollection<OrderLine, OrderLineIdentity> _orderLines = new EntityCollection<OrderLine, OrderLineIdentity>();
+        private readonly OrderLineCollection _orderLines = new OrderLineCollection();
 
         private Order(TypedEvent<OrderCreated> initialEvent)
         {
@@ -35,7 +35,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 
         public string CustomerName { get; private set; }
 
-        public IEntityCollection<OrderLine, OrderLineIdentity> Lines => _orderLines;
+        public IOrderLineCollection Lines => _orderLines;
 
         public override OrderIdentity GetIdentity() => Identity;
 

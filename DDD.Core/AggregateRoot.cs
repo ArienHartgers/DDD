@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace DDD.Core
 {
@@ -22,7 +23,7 @@ namespace DDD.Core
             }
         }
 
-        IEnumerable<LoadedEvent> IAggregateLoader.GetUncommittedChanges()
+        IReadOnlyCollection<LoadedEvent> IAggregateLoader.GetUncommittedChanges()
         {
             return _changes;
         }
@@ -95,5 +96,38 @@ namespace DDD.Core
                 }
             }
         }
+
+        protected static TAggregateRoot CreateWithEvent<TAggregateRoot, TEvent>(DateTimeOffset dateTimeOffset, TEvent firstEvent)
+            where TAggregateRoot : AggregateRoot<TIdentity>
+            where TEvent : Event
+        {
+            var aggregateRoot = CallAggregateConstructor<TAggregateRoot, TEvent>(new TypedEvent<TEvent>(dateTimeOffset, firstEvent));
+            aggregateRoot.ApplyInitialEvent(new LoadedEvent(dateTimeOffset, firstEvent));
+            return aggregateRoot;
+        }
+
+        private static TAggregateRoot CallAggregateConstructor<TAggregateRoot, TEvent>(TypedEvent<TEvent> typedEvent)
+                   where TAggregateRoot : AggregateRoot<TIdentity>
+                   where TEvent : Event
+        {
+
+            var constructors = typeof(TAggregateRoot).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            if (constructors.Length == 1)
+            {
+                var constructor = constructors[0];
+                if (constructor.IsPrivate)
+                {
+
+                    var paramTypes = constructor.GetParameters();
+                    if (paramTypes.Length == 1 && paramTypes[0].ParameterType == typedEvent.GetType())
+                    {
+                        return (TAggregateRoot)constructor.Invoke(new object[] { typedEvent });
+                    }
+                }
+            }
+
+            throw new Exception($"Aggregate {typeof(TAggregateRoot).Name} must have 1 private constructor(TypedEvent<{typeof(TEvent).Name}> initialEvent)");
+        }
+
     }
 }
