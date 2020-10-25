@@ -10,6 +10,7 @@ namespace DDD.Core
         private static bool _isChecked = false;
         private readonly List<LoadedEvent> _changes = new List<LoadedEvent>();
         private bool _isRemoved = false;
+        private IAggregateContext? _context;
 
 
         public int Version { get; internal set; }
@@ -21,6 +22,11 @@ namespace DDD.Core
                 _isChecked = true;
                 AssureReadonlyProperties();
             }
+        }
+
+        void IAggregateLoader.SetAggregateContext(IAggregateContext context)
+        {
+            _context = context;
         }
 
         IReadOnlyCollection<LoadedEvent> IAggregateLoader.GetUncommittedChanges()
@@ -58,8 +64,18 @@ namespace DDD.Core
             }
 
             ApplyChange(
-                new LoadedEvent(DateTimeOffset.Now, @event),
+                new LoadedEvent(GetDateTime(), @event),
                 true);
+        }
+
+        protected DateTimeOffset GetDateTime()
+        {
+            if (_context == null)
+            {
+                throw new InvalidOperationException("AggregateContext is not initialized (in the constructor)");
+            }
+
+            return _context.GetDateTime();
         }
 
         void IEntityModifier.ApplyChange(Event @event)
@@ -97,20 +113,22 @@ namespace DDD.Core
             }
         }
 
-        protected static TAggregateRoot CreateWithEvent<TAggregateRoot, TEvent>(DateTimeOffset dateTimeOffset, TEvent firstEvent)
+        protected static TAggregateRoot CreateWithEvent<TAggregateRoot, TEvent>(IAggregateContext context, TEvent firstEvent)
             where TAggregateRoot : AggregateRoot<TIdentifier>
             where TEvent : Event
         {
-            var aggregateRoot = CallAggregateConstructor<TAggregateRoot, TEvent>(new TypedEvent<TEvent>(dateTimeOffset, firstEvent));
-            aggregateRoot.ApplyInitialEvent(new LoadedEvent(dateTimeOffset, firstEvent));
+            var now = context.GetDateTime();
+            var aggregateRoot = CallAggregateConstructor<TAggregateRoot, TEvent>(new TypedEvent<TEvent>(now, firstEvent));
+            aggregateRoot._context = context;
+
+            aggregateRoot.ApplyInitialEvent(new LoadedEvent(now, firstEvent));
             return aggregateRoot;
         }
 
         private static TAggregateRoot CallAggregateConstructor<TAggregateRoot, TEvent>(TypedEvent<TEvent> typedEvent)
-                   where TAggregateRoot : AggregateRoot<TIdentifier>
-                   where TEvent : Event
+            where TAggregateRoot : AggregateRoot<TIdentifier>
+            where TEvent : Event
         {
-
             var constructors = typeof(TAggregateRoot).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             if (constructors.Length == 1)
             {

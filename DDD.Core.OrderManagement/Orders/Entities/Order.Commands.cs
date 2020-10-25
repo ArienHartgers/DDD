@@ -2,16 +2,20 @@
 using System.Linq;
 using DDD.Core.OrderManagement.Orders.Events;
 using DDD.Core.OrderManagement.Orders.Identitfiers;
+using DDD.Core.OrderManagement.Products.Entities;
 using DDD.Core.OrderManagement.Products.Identities;
 
 namespace DDD.Core.OrderManagement.Orders.Entities
 {
     public partial class Order
     {
-        public static Order Create(DateTimeOffset now, OrderIdentifier orderIdentifier, CustomerIdentifier customerIdentifier)
+        public static Order Create(
+            IAggregateContext context, 
+            OrderIdentifier orderIdentifier, 
+            CustomerIdentifier customerIdentifier)
         {
             return CreateWithEvent<Order, OrderCreated>(
-                now,
+                context,
                 new OrderCreated(
                     orderIdentifier,
                     customerIdentifier));
@@ -32,15 +36,9 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 
         public OrderLine CreateOrderLine(ProductIdentifier productIdentifier, int quantity)
         {
-            var itemLine = Lines.FirstOrDefault(ol => ol.ProductIdentifier == productIdentifier);
-            if (itemLine != null)
+            if (Lines.Any(ol => ol.ProductIdentifier == productIdentifier))
             {
-                ApplyChange(new OrderLineQuantityAdjusted(
-                    OrderIdentifier,
-                    itemLine.Identifier,
-                    itemLine.Quantity + quantity));
-
-                return itemLine;
+                throw new InvalidOperationException($"An orderline with product {productIdentifier} already exists");
             }
 
             var orderLineIdentifier = OrderLineIdentifier.NextIdentifier(Lines.LastIdentifier);
@@ -53,6 +51,18 @@ namespace DDD.Core.OrderManagement.Orders.Entities
                     quantity));
 
             return Lines.Get(orderLineIdentifier);
+        }
+
+        public void AdjustOrderLine(OrderLineIdentifier orderLineIdentifier, in int quantity)
+        {
+            var orderLine = _orderLines.Get(orderLineIdentifier);
+            if (orderLine.Quantity != quantity)
+            {
+                ApplyChange(new OrderLineQuantityAdjusted(
+                    OrderIdentifier,
+                    orderLine.Identifier,
+                    quantity));
+            }
         }
     }
 }

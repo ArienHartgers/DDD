@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text.Json;
-using DDD.Core.OrderManagement.Orders.Identitfiers;
+﻿using DDD.Core.OrderManagement.Orders.Identitfiers;
 
 namespace DDD.Core.OrderManagement.Orders.Events
 {

@@ -37,9 +37,3 @@ Scenario: Change order line quantity to same value
 	And order has an item product salt whith quantity 7
 	When I change quantity to 7 from orderline with id 1
 	Then No Result is expected
-
-Scenario: Add same product again
-	Given I have an order
-	And order has an item product salt whith quantity 7
-	When I add 3 items of product salt to the order
-	Then itemline 1 quantity is changed to 10

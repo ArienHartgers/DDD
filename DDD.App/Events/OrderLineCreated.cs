@@ -1,6 +1,4 @@
-﻿using DDD.Core.OrderManagement.Products.Identities;
-
-namespace DDD.App.Events
+﻿namespace DDD.App.Events
 {
     public class OrderLineCreated : IDomainEvent
     {

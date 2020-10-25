@@ -1,60 +1,189 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DDD.Core.OrderManagement.Tests.Helpers
 {
-    public class AggregateTester<TRepository>
+    public class AggregateTester<TAggregate, TIdentifier> : IDisposable
+        where TIdentifier : IIdentifier
+        where TAggregate : AggregateRoot<TIdentifier>, IAggregateLoader
     {
         private readonly TestEventStore _eventStore;
-        private readonly Func<IEventStore, TRepository> _repositoryFactory;
 
-        public AggregateTester(Func<IEventStore, TRepository> repositoryFactory)
+        private readonly Repository<TAggregate, TIdentifier> _repository;
+        private TAggregate _aggregate;
+        private List<LoadedEvent>? _uncommittedChanges;
+        private int _uncommitedCount;
+
+        public enum Mode
         {
+            Given,
+            When,
+            Then
+        }
+
+        public AggregateTester(TIdentifier identifier)//Func<IEventStore, TRepository> repositoryFactory)
+        {
+            Identifier = identifier;
             _eventStore = new TestEventStore();
-            _repositoryFactory = repositoryFactory;
+            //_repositoryFactory = repositoryFactory;
+            GivenDateTime = new DateTimeOffset(2000, 1, 20, 8, 0, 0, TimeSpan.FromHours(2));
+            WhenDateTime = new DateTimeOffset(2000, 2, 20, 8, 0, 0, TimeSpan.FromHours(2));
+
+            AggregateContext = new TestAggregateContext(this);
+            _repository = new Repository<TAggregate, TIdentifier>(_eventStore, AggregateContext);
         }
 
+        public Mode TestMode { get; private set; }
 
-        public void Run(
-            LoadedEvent[] given, 
-            Func<WhenContext, IAggregateLoader> when,
-            Action<ThenContext> then)
+        public IAggregateContext AggregateContext { get; }
+
+        public TIdentifier Identifier { get; }
+
+        public DateTimeOffset GivenDateTime { get; set; }
+
+        public DateTimeOffset WhenDateTime { get; set; }
+
+        public void Given(Event @event)
         {
-            _eventStore.AddTestEvents("1", given);
-
-            var repository = _repositoryFactory(_eventStore);
-
-            var whenContext = new WhenContext(repository);
-
-            var aggregateLoader =  when(whenContext);
-            
-            var uncommittedChanges = aggregateLoader.GetUncommittedChanges().ToList();
-
-            var thenContext = new ThenContext(uncommittedChanges);
-
-            then(thenContext);
-        }
-
-        public class WhenContext
-        {
-            public TRepository Repository { get; }
-
-            public WhenContext(TRepository repository)
+            if (TestMode != Mode.Given)
             {
-                Repository = repository;
+                throw new InvalidOperationException("TestMode error. Cannot execute Given() when TestMode is not Mode.Given");
+            }
+
+            _eventStore.AddTestEvents(
+                Identifier.ToString(),
+                new LoadedEvent(
+                    GivenDateTime,
+                    @event));
+        }
+
+        internal void When(TAggregate aggregate)
+        {
+            if (TestMode != Mode.Given)
+            {
+                throw new InvalidOperationException("TestMode error. Cannot execute When() when TestMode is not Given");
+            }
+
+            TestMode = Mode.When;
+
+            _aggregate = aggregate;
+        }
+
+        public TAggregate When()
+        {
+            if (TestMode == Mode.Then)
+            {
+                throw new InvalidOperationException("TestMode error. Cannot execute When() when TestMode is not Given");
+            }
+
+            if (TestMode == Mode.Given)
+            {
+                TestMode = Mode.When;
+                _aggregate = _repository.Get(Identifier);
+            }
+
+            return _aggregate;
+        }
+
+        public void ThenAggregate(Action<TAggregate> a)
+        {
+            PrepareThen();
+
+            a(_aggregate);
+        }
+
+
+        internal void Then<TEvent>()
+            where TEvent : Event
+        {
+            PrepareThen();
+            GetNextEvent<TEvent>();
+        }
+
+        internal void Then<TEvent>(Action<TEvent> e)
+            where TEvent : Event
+        {
+            PrepareThen();
+
+            e(GetNextEvent<TEvent>());
+        }
+
+        internal void ThenNothing()
+        {
+            PrepareThen();
+
+            var e = _uncommittedChanges?.FirstOrDefault();
+            if (e != null)
+            {
+                _uncommittedChanges = null;
+                Assert.Fail($"No events expected but event {e.Data.GetType().Name} found.");
             }
         }
 
-        public class ThenContext
+        private TEvent GetNextEvent<TEvent>()
+            where TEvent : Event
         {
-            public List<LoadedEvent> Events { get; }
-
-            public ThenContext(List<LoadedEvent> events)
+            _uncommitedCount++;
+            var e = _uncommittedChanges?.FirstOrDefault();
+            if (e == null)
             {
-                Events = events;
+                Assert.Fail($"There is no event {_uncommitedCount} of type {typeof(TEvent).Name} available.");
+            }
+
+            _uncommittedChanges.RemoveAt(0);
+
+            if (e.Data is TEvent @event)
+            {
+                return @event;
+            }
+
+            Assert.Fail($"Expect event {_uncommitedCount} of type {typeof(TEvent).Name}, but event of type {e.Data.GetType().Name} found.");
+            return null!;
+        }
+
+        public void Dispose()
+        {
+            if (TestMode != Mode.Then)
+            {
+                throw new InvalidOperationException("TestMode error. Test has no Then.");
+            }
+
+            var e = _uncommittedChanges?.FirstOrDefault();
+            if (e != null)
+            {
+                Assert.Fail($"Not all events are verified in the test. Please call ThenNothing() or Then<{e.Data.GetType().Name}>(e=>{{}});");
             }
         }
 
+        private void PrepareThen()
+        {
+            if (TestMode == Mode.Given)
+            {
+                throw new InvalidOperationException("TestMode error. Cannot execute Then() when TestMode is Given");
+            }
+
+            if (TestMode == Mode.When)
+            {
+                _uncommittedChanges = _aggregate.GetUncommittedChanges().ToList();
+                TestMode = Mode.Then;
+            }
+        }
+
+        private class TestAggregateContext : IAggregateContext
+        {
+            private readonly AggregateTester<TAggregate, TIdentifier> _aggregateTester;
+
+            public TestAggregateContext(AggregateTester<TAggregate, TIdentifier> aggregateTester)
+            {
+                _aggregateTester = aggregateTester;
+            }
+
+            public DateTimeOffset GetDateTime()
+            {
+                return _aggregateTester.WhenDateTime;
+            }
+        }
     }
 }

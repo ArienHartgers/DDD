@@ -1,5 +1,4 @@
-﻿using System;
-using DDD.Core.OrderManagement.Orders.Identitfiers;
+﻿using DDD.Core.OrderManagement.Orders.Identitfiers;
 
 namespace DDD.Core.OrderManagement.Orders.Events
 {

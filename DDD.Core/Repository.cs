@@ -4,27 +4,19 @@ using System.Reflection;
 
 namespace DDD.Core
 {
-    public abstract class Repository<TAggregateRoot, TIdentifier>
+    public class Repository<TAggregateRoot, TIdentifier>
         where TIdentifier : IIdentifier
         where TAggregateRoot : AggregateRoot<TIdentifier>, IAggregateLoader
     {
         private readonly IEventStore _eventStore;
 
-        protected Repository(IEventStore eventStore)
+        public Repository(IEventStore eventStore, IAggregateContext aggregateContext)
         {
+            AggregateContext = aggregateContext;
             _eventStore = eventStore;
         }
 
-
-        //protected TAggregateRoot Create(Event @event)
-        //{
-        //    var loadedEvent = new LoadedEvent(DateTimeOffset.Now, @event);
-        //    TAggregateRoot aggregate = CreateInternal(loadedEvent);
-
-        //    aggregate.ApplyInitialEvent(loadedEvent);
-
-        //    return aggregate;
-        //}
+        public IAggregateContext AggregateContext { get; }
 
         public TAggregateRoot Get(IIdentifier identifier)
         {
@@ -45,8 +37,8 @@ namespace DDD.Core
             if (firstLoadedEvent != null)
             {
                 TAggregateRoot aggregate = CreateInternal(firstLoadedEvent);
-
                 IAggregateLoader loader = aggregate;
+                loader.SetAggregateContext(AggregateContext);
                 loader.LoadFromHistory(eventsResult.Version, eventsResult.Events.Skip(1));
                 return aggregate;
             }
@@ -82,7 +74,7 @@ namespace DDD.Core
                     var paramTypes = constructor.GetParameters();
                     if (paramTypes.Length == 1 && paramTypes[0].ParameterType == typedEventType)
                     {
-                        return (TAggregateRoot) constructor.Invoke(new object[] { typedEvent });
+                        return (TAggregateRoot)constructor.Invoke(new object[] { typedEvent });
                     }
                 }
             }

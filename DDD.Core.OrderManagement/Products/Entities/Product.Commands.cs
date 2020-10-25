@@ -1,5 +1,4 @@
-﻿using System;
-using DDD.Core.OrderManagement.Products.Events;
+﻿using DDD.Core.OrderManagement.Products.Events;
 using DDD.Core.OrderManagement.Products.Identities;
 using DDD.Core.OrderManagement.Products.ValueObjects;
 
@@ -7,11 +6,15 @@ namespace DDD.Core.OrderManagement.Products.Entities
 {
     public partial class Product
     {
-        public static Product Create(DateTimeOffset now, ProductName productName)
+        public static Product Create(
+            IAggregateContext context,
+            ProductName productName)
         {
             return Product.CreateWithEvent<Product, ProductCreated>(
-                now,
-                new ProductCreated(ProductIdentifier.New(), productName));
+                context,
+                new ProductCreated(
+                    ProductIdentifier.New(), 
+                    productName));
         }
 
         public void ChangeName(ProductName productName)

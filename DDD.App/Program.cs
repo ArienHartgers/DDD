@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text.Json;
-using DDD.App.Events;
+﻿using System.Text.Json;
 using DDD.Core;
 using DDD.Core.OrderManagement.BDD;
 using DDD.Core.OrderManagement.Orders;
@@ -18,7 +15,6 @@ namespace DDD.App
     {
         static void Main()
         {
-
             var eventsConverter = new EventsConverter();
 
             //var e = new Core.OrderManagement.Orders.Events.OrderCreated(OrderIdentity.New());
@@ -37,10 +33,12 @@ namespace DDD.App
 
             //return;
 
-            IEventStore eventStore = new TestEventStore();
-            var productRepository = new ProductRepository(eventStore);
+            var aggregateContext = new TestAggregateContext();
 
-            var product = Product.Create(DateTimeOffset.Now, ProductName.Create("Brood"));
+            IEventStore eventStore = new TestEventStore();
+            var productRepository = new ProductRepository(eventStore, aggregateContext);
+
+            var product = Product.Create(aggregateContext, ProductName.Create("Brood"));
 
             productRepository.Save(product);
 
@@ -49,7 +47,7 @@ namespace DDD.App
 
 
 
-            var productRepository2 = new ProductRepository(eventStore);
+            var productRepository2 = new ProductRepository(eventStore, aggregateContext);
             
             var product2 = productRepository2.Get(product.Identifier);
 
@@ -57,10 +55,11 @@ namespace DDD.App
             //System.Console.WriteLine(JsonSerializer.Serialize(product2, new JsonSerializerOptions { WriteIndented = true }));
 
 
+            var orderRepository = new OrderRepository(eventStore, aggregateContext);
 
 
             var order = Order.Create(
-                DateTimeOffset.Now,
+                aggregateContext,
                 OrderIdentifier.New(), 
                 CustomerIdentifier.New());
 
@@ -80,7 +79,6 @@ namespace DDD.App
             boterOrderLine.AdjustQuantity(3);
 
 
-            var orderRepository = new OrderRepository(eventStore);
             orderRepository.Save(order);
 
             var order2 = orderRepository.Get(order.OrderIdentifier);

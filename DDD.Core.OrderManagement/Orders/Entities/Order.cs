@@ -15,7 +15,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 
             OrderIdentifier = initialEvent.Event.OrderIdentifier;
             CustomerIdentifier = initialEvent.Event.CustomerIdentifier;
-            CustomerName = initialEvent.Event.CustomerIdentifier.CustomerGuid.ToString();
+            CustomerName = initialEvent.Event.CustomerIdentifier.ToString();
 
             RegisterEvent<OrderCustomerNameChanged>(OrderCustomerNameChangedEventHandler);
 
@@ -27,7 +27,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 
         public OrderIdentifier OrderIdentifier { get; }
     
-        public DateTimeOffset Created { get; set; }
+        public DateTimeOffset Created { get; private set; }
 
         public CustomerIdentifier CustomerIdentifier { get; }
 

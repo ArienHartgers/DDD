@@ -25,11 +25,13 @@ namespace DDD.Core.OrderManagement.BDD
 
         // Then
         private Stack<LoadedEvent>? _eventStack;
+        private TestAggregateContext _aggregateContext;
 
         public DDDSteps()
         {
             _eventStore = new TestEventStore();
             _orderIdentifier = OrderIdentifier.New();
+            _aggregateContext = new TestAggregateContext();
         }
 
         [Given(@"I have an order")]
@@ -171,10 +173,10 @@ namespace DDD.Core.OrderManagement.BDD
                 throw new Exception("Event store is null");
             }
 
-            var orderRepository = new OrderRepository(_eventStore);
+            var orderRepository = new OrderRepository(_eventStore, _aggregateContext);
 
             _order = Order.Create(
-                DateTimeOffset.Now,
+                _aggregateContext,
                 OrderIdentifier.New(), 
                 CustomerIdentifier.New());
 
@@ -190,7 +192,7 @@ namespace DDD.Core.OrderManagement.BDD
                     throw new Exception("Event store is null");
                 }
 
-                var orderRepository = new OrderRepository(_eventStore);
+                var orderRepository = new OrderRepository(_eventStore, _aggregateContext);
                 _order = orderRepository.Get(_orderIdentifier);
                 _eventStore = null;
             }

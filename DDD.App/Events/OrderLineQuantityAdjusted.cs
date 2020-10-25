@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DDD.App.Events
+﻿namespace DDD.App.Events
 {
     public class OrderLineQuantityAdjusted : IDomainEvent
     {
