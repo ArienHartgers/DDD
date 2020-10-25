@@ -11,8 +11,8 @@ namespace DDD.Core.OrderManagement.Orders.Entities
             {
                 ApplyChange(
                     new OrderLineQuantityAdjusted(
-                        _order.Identity,
-                        Identity,
+                        _order.OrderIdentifier,
+                        Identifier,
                         quantity));
             }
         }
@@ -20,8 +20,8 @@ namespace DDD.Core.OrderManagement.Orders.Entities
         public void Remove()
         {
             ApplyChange(new OrderLineRemoved(
-                _order.Identity,
-                Identity));
+                _order.OrderIdentifier,
+                Identifier));
         }
     }
 }

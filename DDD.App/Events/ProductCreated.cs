@@ -2,13 +2,13 @@
 {
     public class ProductCreated : IDomainEvent
     {
-        public ProductCreated(string productIdentity, string productName)
+        public ProductCreated(string productIdentifier, string productName)
         {
-            ProductIdentity = productIdentity;
+            ProductIdentifier = productIdentifier;
             ProductName = productName;
         }
 
-        public string ProductIdentity { get; }
+        public string ProductIdentifier { get; }
 
         public string ProductName { get; }
     }

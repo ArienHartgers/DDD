@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace DDD.Core
 {
-    public abstract class AggregateRoot<TIdentity> : EntityBase<TIdentity>, IAggregateLoader, IEntityModifier
+    public abstract class AggregateRoot<TIdentifier> : EntityBase<TIdentifier>, IAggregateLoader, IEntityModifier
     {
         private static bool _isChecked = false;
         private readonly List<LoadedEvent> _changes = new List<LoadedEvent>();
@@ -98,7 +98,7 @@ namespace DDD.Core
         }
 
         protected static TAggregateRoot CreateWithEvent<TAggregateRoot, TEvent>(DateTimeOffset dateTimeOffset, TEvent firstEvent)
-            where TAggregateRoot : AggregateRoot<TIdentity>
+            where TAggregateRoot : AggregateRoot<TIdentifier>
             where TEvent : Event
         {
             var aggregateRoot = CallAggregateConstructor<TAggregateRoot, TEvent>(new TypedEvent<TEvent>(dateTimeOffset, firstEvent));
@@ -107,7 +107,7 @@ namespace DDD.Core
         }
 
         private static TAggregateRoot CallAggregateConstructor<TAggregateRoot, TEvent>(TypedEvent<TEvent> typedEvent)
-                   where TAggregateRoot : AggregateRoot<TIdentity>
+                   where TAggregateRoot : AggregateRoot<TIdentifier>
                    where TEvent : Event
         {
 

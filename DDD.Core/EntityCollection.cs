@@ -4,41 +4,41 @@ using System.Collections.Generic;
 
 namespace DDD.Core
 {
-    public class EntityCollection<TEntity, TIdentity> : IEntityCollection<TEntity, TIdentity>
-        where TIdentity : class, IIdentity
-        where TEntity : Entity<TIdentity>
+    public class EntityCollection<TEntity, TIdentifier> : IEntityCollection<TEntity, TIdentifier>
+        where TIdentifier : class, IIdentifier
+        where TEntity : Entity<TIdentifier>
     {
-        private readonly Dictionary<TIdentity, TEntity> _entities = new Dictionary<TIdentity, TEntity>();
+        private readonly Dictionary<TIdentifier, TEntity> _entities = new Dictionary<TIdentifier, TEntity>();
 
         public IReadOnlyCollection<TEntity> Entities => _entities.Values;
 
-        public TIdentity? LastIdentity { get; private set; }
+        public TIdentifier? LastIdentifier { get; private set; }
 
         public void Add(TEntity entity)
         {
-            _entities.Add(entity.GetIdentity(), entity);
+            _entities.Add(entity.GetIdentifier(), entity);
 
-            LastIdentity = entity.GetIdentity();
+            LastIdentifier = entity.GetIdentifier();
         }
 
-        public void Remove(TIdentity identity)
+        public void Remove(TIdentifier identifier)
         {
-            if (_entities.TryGetValue(identity, out var entity))
+            if (_entities.TryGetValue(identifier, out var entity))
             {
                 IEntityModifier changer = entity;
                 changer.MarkAsRemoved();
-                _entities.Remove(identity);
+                _entities.Remove(identifier);
             }
         }
 
-        public bool TryGet(TIdentity identity, out TEntity entity)
+        public bool TryGet(TIdentifier identifier, out TEntity entity)
         {
-            return _entities.TryGetValue(identity, out entity);
+            return _entities.TryGetValue(identifier, out entity);
         }
 
-        public TEntity? Find(TIdentity identity)
+        public TEntity? Find(TIdentifier identifier)
         {
-            if (TryGet(identity, out var entity))
+            if (TryGet(identifier, out var entity))
             {
                 return entity;
             }
@@ -46,23 +46,23 @@ namespace DDD.Core
             return null;
         }
 
-        public TEntity Get(TIdentity identity)
+        public TEntity Get(TIdentifier identifier)
         {
-            if (TryGet(identity, out var entity))
+            if (TryGet(identifier, out var entity))
             {
                 return entity;
             }
 
-            throw new Exception($"Entity '{identity}' not found");
+            throw new Exception($"Entity '{identifier}' not found");
         }
 
-        public Action<HandlerEvent<TEvent>> ForwardTo<TEvent>(Func<TEvent, TIdentity> selector)
+        public Action<HandlerEvent<TEvent>> ForwardTo<TEvent>(Func<TEvent, TIdentifier> selector)
             where TEvent : Event
         {
             return @event =>
             {
-                var identity = selector(@event.Event);
-                if (TryGet(identity, out var entity))
+                var identifier = selector(@event.Event);
+                if (TryGet(identifier, out var entity))
                 {
                     @event.ForwardTo(entity);
                 }

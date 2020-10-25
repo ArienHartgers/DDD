@@ -4,13 +4,13 @@ namespace DDD.App.Events
 {
     public class OrderCreated : IDomainEvent
     {
-        public OrderCreated(string orderIdentity, Guid customerGuid)
+        public OrderCreated(string orderIdentifier, Guid customerGuid)
         {
-            OrderIdentity = orderIdentity;
+            OrderIdentifier = orderIdentifier;
             CustomerGuid = customerGuid;
         }
 
-        public string OrderIdentity { get; set; }
+        public string OrderIdentifier { get; set; }
         public Guid CustomerGuid { get; }
     }
 }

@@ -3,7 +3,7 @@ using System.Linq;
 using DDD.Core.OrderManagement.Orders;
 using DDD.Core.OrderManagement.Orders.Entities;
 using DDD.Core.OrderManagement.Orders.Events;
-using DDD.Core.OrderManagement.Orders.Identities;
+using DDD.Core.OrderManagement.Orders.Identitfiers;
 using DDD.Core.OrderManagement.Tests.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
@@ -14,15 +14,15 @@ namespace DDD.Core.OrderManagement.Tests.Orders.Entities
     public class OrderTest
     {
         private readonly AggregateTester<OrderRepository> _tester;
-        private readonly OrderIdentity _orderIdentity;
-        private readonly CustomerIdentity _customerIdentity;
+        private readonly OrderIdentifier _orderIdentifier;
+        private readonly CustomerIdentifier _customerIdentifier;
 
         public OrderTest()
         {
             _tester = new AggregateTester<OrderRepository>(eventStore => new OrderRepository(eventStore));
 
-            _orderIdentity = OrderIdentity.New();
-            _customerIdentity = CustomerIdentity.New();
+            _orderIdentifier = OrderIdentifier.New();
+            _customerIdentifier = CustomerIdentifier.New();
         }
 
         [TestMethod]
@@ -33,15 +33,15 @@ namespace DDD.Core.OrderManagement.Tests.Orders.Entities
                 new LoadedEvent[0],
                 when => Order.Create(
                     DateTimeOffset.Now,
-                    _orderIdentity,
-                    _customerIdentity),
+                    _orderIdentifier,
+                    _customerIdentifier),
                 then=>
                 {
                     then.Events.Count.ShouldBe(1);
                     var loadedEvent = then.Events.First();
                     var e = (OrderCreated) loadedEvent.Data;
-                    e.OrderIdentity.ShouldBe(_orderIdentity);
-                    e.CustomerIdentity.ShouldBe(_customerIdentity);
+                    e.OrderIdentifier.ShouldBe(_orderIdentifier);
+                    e.CustomerIdentifier.ShouldBe(_customerIdentifier);
                 }
             );
 
@@ -55,11 +55,11 @@ namespace DDD.Core.OrderManagement.Tests.Orders.Entities
                 new LoadedEvent[]
                 {
                     new LoadedEvent(DateTimeOffset.Now, 
-                        new OrderCreated(_orderIdentity, CustomerIdentity.New())), 
+                        new OrderCreated(_orderIdentifier, CustomerIdentifier.New())), 
                 },
                 when =>
                 {
-                    var order = when.Repository.Get(_orderIdentity);
+                    var order = when.Repository.Get(_orderIdentifier);
                     order.ChangeCustomerName("Changed");
                     return order;
                 },
@@ -68,8 +68,8 @@ namespace DDD.Core.OrderManagement.Tests.Orders.Entities
                     then.Events.Count.ShouldBe(1);
                     var loadedEvent = then.Events.First();
                     var e = (OrderCreated)loadedEvent.Data;
-                    e.OrderIdentity.ShouldBe(_orderIdentity);
-                    e.CustomerIdentity.ShouldBe(_customerIdentity);
+                    e.OrderIdentifier.ShouldBe(_orderIdentifier);
+                    e.CustomerIdentifier.ShouldBe(_customerIdentifier);
                 }
             );
 

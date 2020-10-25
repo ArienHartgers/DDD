@@ -4,9 +4,9 @@ using System.Reflection;
 
 namespace DDD.Core
 {
-    public abstract class Repository<TAggregateRoot, TIdentity>
-        where TIdentity : IIdentity
-        where TAggregateRoot : AggregateRoot<TIdentity>, IAggregateLoader
+    public abstract class Repository<TAggregateRoot, TIdentifier>
+        where TIdentifier : IIdentifier
+        where TAggregateRoot : AggregateRoot<TIdentifier>, IAggregateLoader
     {
         private readonly IEventStore _eventStore;
 
@@ -26,20 +26,20 @@ namespace DDD.Core
         //    return aggregate;
         //}
 
-        public TAggregateRoot Get(IIdentity identity)
+        public TAggregateRoot Get(IIdentifier identifier)
         {
-            var agg = Find(identity);
+            var agg = Find(identifier);
             if (agg == null)
             {
-                throw new Exception($"{typeof(TAggregateRoot).Name} with identity '{identity}' not found");
+                throw new Exception($"{typeof(TAggregateRoot).Name} with identifier '{identifier}' not found");
             }
 
             return agg;
         }
 
-        public TAggregateRoot? Find(IIdentity identity)
+        public TAggregateRoot? Find(IIdentifier identifier)
         {
-            var eventsResult = _eventStore.GetStreamEvents(identity.Identity);
+            var eventsResult = _eventStore.GetStreamEvents(identifier.Identifier);
 
             var firstLoadedEvent = eventsResult.Events.FirstOrDefault();
             if (firstLoadedEvent != null)
@@ -60,7 +60,7 @@ namespace DDD.Core
             var changes = loader.GetUncommittedChanges();
             if (changes.Any())
             {
-                var streamName = aggregate.GetIdentity().ToString();
+                var streamName = aggregate.GetIdentifier().ToString();
                 _eventStore.SaveEvents(streamName, aggregate.Version, changes);
                 loader.MarkChangesAsCommitted();
             }

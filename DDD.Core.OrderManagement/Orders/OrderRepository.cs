@@ -1,10 +1,10 @@
 ﻿using DDD.Core.OrderManagement.Orders.Entities;
 using DDD.Core.OrderManagement.Orders.Events;
-using DDD.Core.OrderManagement.Orders.Identities;
+using DDD.Core.OrderManagement.Orders.Identitfiers;
 
 namespace DDD.Core.OrderManagement.Orders
 {
-    public class OrderRepository : Repository<Order, OrderIdentity>
+    public class OrderRepository : Repository<Order, OrderIdentifier>
     {
         public OrderRepository(IEventStore eventStore) : base(eventStore)
         {

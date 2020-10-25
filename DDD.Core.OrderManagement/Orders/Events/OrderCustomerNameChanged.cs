@@ -1,16 +1,16 @@
-﻿using DDD.Core.OrderManagement.Orders.Identities;
+﻿using DDD.Core.OrderManagement.Orders.Identitfiers;
 
 namespace DDD.Core.OrderManagement.Orders.Events
 {
     public class OrderCustomerNameChanged : Event
     {
-        public OrderCustomerNameChanged(OrderIdentity orderIdentity, string customerName)
+        public OrderCustomerNameChanged(OrderIdentifier orderIdentifier, string customerName)
         {
-            OrderIdentity = orderIdentity;
+            OrderIdentifier = orderIdentifier;
             CustomerName = customerName;
         }
 
-        public OrderIdentity OrderIdentity { get; set; }
+        public OrderIdentifier OrderIdentifier { get; set; }
         public string CustomerName { get; }
     }
 }

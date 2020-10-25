@@ -5,13 +5,13 @@ namespace DDD.Core.OrderManagement.Products.Events
 {
     public class ProductCreated : Event
     {
-        public ProductCreated(ProductIdentity productIdentity, ProductName productName)
+        public ProductCreated(ProductIdentifier productIdentifier, ProductName productName)
         {
-            ProductIdentity = productIdentity;
+            ProductIdentifier = productIdentifier;
             ProductName = productName;
         }
 
-        public ProductIdentity ProductIdentity { get; }
+        public ProductIdentifier ProductIdentifier { get; }
 
         public ProductName ProductName { get; }
     }

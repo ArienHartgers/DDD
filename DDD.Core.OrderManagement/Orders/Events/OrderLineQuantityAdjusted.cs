@@ -1,19 +1,19 @@
 ﻿using System;
-using DDD.Core.OrderManagement.Orders.Identities;
+using DDD.Core.OrderManagement.Orders.Identitfiers;
 
 namespace DDD.Core.OrderManagement.Orders.Events
 {
     public class OrderLineQuantityAdjusted : Event
     {
-        public OrderLineQuantityAdjusted(OrderIdentity orderIdentity, OrderLineIdentity orderLineIdentity, int quantity)
+        public OrderLineQuantityAdjusted(OrderIdentifier orderIdentifier, OrderLineIdentifier orderLineIdentifier, int quantity)
         {
-            OrderIdentity = orderIdentity;
-            OrderLineIdentity = orderLineIdentity;
+            OrderIdentifier = orderIdentifier;
+            OrderLineIdentifier = orderLineIdentifier;
             Quantity = quantity;
         }
 
-        public OrderIdentity OrderIdentity { get; set; }
-        public OrderLineIdentity OrderLineIdentity { get; set; }
+        public OrderIdentifier OrderIdentifier { get; set; }
+        public OrderLineIdentifier OrderLineIdentifier { get; set; }
         public int Quantity { get; set; }
     }
 }

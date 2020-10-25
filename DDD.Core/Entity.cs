@@ -2,7 +2,7 @@
 
 namespace DDD.Core
 {
-    public abstract class Entity<TIdentity> : EntityBase<TIdentity>, IEntityModifier
+    public abstract class Entity<TIdentifier> : EntityBase<TIdentifier>, IEntityModifier
     {
         private IEntityModifier? _root;
 

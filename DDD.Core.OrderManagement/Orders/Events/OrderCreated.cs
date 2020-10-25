@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Text.Json;
-using DDD.Core.OrderManagement.Orders.Identities;
+using DDD.Core.OrderManagement.Orders.Identitfiers;
 
 namespace DDD.Core.OrderManagement.Orders.Events
 {
     public class OrderCreated : Event
     {
-        public OrderCreated(OrderIdentity orderIdentity, CustomerIdentity customerIdentity)
+        public OrderCreated(OrderIdentifier orderIdentifier, CustomerIdentifier customerIdentifier)
         {
-            OrderIdentity = orderIdentity;
-            CustomerIdentity = customerIdentity;
+            OrderIdentifier = orderIdentifier;
+            CustomerIdentifier = customerIdentifier;
         }
 
-        public OrderIdentity OrderIdentity { get; }
-        public CustomerIdentity CustomerIdentity { get; }
+        public OrderIdentifier OrderIdentifier { get; }
+        public CustomerIdentifier CustomerIdentifier { get; }
     }
 }

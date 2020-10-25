@@ -5,13 +5,13 @@ namespace DDD.Core.OrderManagement.Products.Events
 {
     public class ProductNameChanged : Event
     {
-        public ProductNameChanged(ProductIdentity productIdentity, ProductName productName)
+        public ProductNameChanged(ProductIdentifier productIdentifier, ProductName productName)
         {
-            ProductIdentity = productIdentity;
+            ProductIdentifier = productIdentifier;
             ProductName = productName;
         }
 
-        public ProductIdentity ProductIdentity { get; }
+        public ProductIdentifier ProductIdentifier { get; }
 
         public ProductName ProductName { get; }
     }

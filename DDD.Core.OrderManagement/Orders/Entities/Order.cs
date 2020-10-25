@@ -1,10 +1,10 @@
 ﻿using System;
 using DDD.Core.OrderManagement.Orders.Events;
-using DDD.Core.OrderManagement.Orders.Identities;
+using DDD.Core.OrderManagement.Orders.Identitfiers;
 
 namespace DDD.Core.OrderManagement.Orders.Entities
 {
-    public partial class Order : AggregateRoot<OrderIdentity>
+    public partial class Order : AggregateRoot<OrderIdentifier>
     {
         private readonly OrderLineCollection _orderLines = new OrderLineCollection();
 
@@ -13,23 +13,23 @@ namespace DDD.Core.OrderManagement.Orders.Entities
             Created = initialEvent.EventDateTime;
             LastUpdate = initialEvent.EventDateTime;
 
-            Identity = initialEvent.Event.OrderIdentity;
-            CustomerIdentity = initialEvent.Event.CustomerIdentity;
-            CustomerName = initialEvent.Event.CustomerIdentity.CustomerGuid.ToString();
+            OrderIdentifier = initialEvent.Event.OrderIdentifier;
+            CustomerIdentifier = initialEvent.Event.CustomerIdentifier;
+            CustomerName = initialEvent.Event.CustomerIdentifier.CustomerGuid.ToString();
 
             RegisterEvent<OrderCustomerNameChanged>(OrderCustomerNameChangedEventHandler);
 
             // OrderLines
             RegisterEvent<OrderLineCreated>(OrderLineCreatedEventHandler);
             RegisterEvent<OrderLineRemoved>(OrderLineRemovedEventHandler);
-            RegisterEvent<OrderLineQuantityAdjusted>(e => e.ForwardTo(_orderLines.Get(e.Event.OrderLineIdentity)));
+            RegisterEvent<OrderLineQuantityAdjusted>(e => e.ForwardTo(_orderLines.Get(e.Event.OrderLineIdentifier)));
         }
 
-        public OrderIdentity Identity { get; }
+        public OrderIdentifier OrderIdentifier { get; }
     
-        public DateTimeOffset Created { get; }
+        public DateTimeOffset Created { get; set; }
 
-        public CustomerIdentity CustomerIdentity { get; }
+        public CustomerIdentifier CustomerIdentifier { get; }
 
         public DateTimeOffset LastUpdate { get; private set; }
 
@@ -37,7 +37,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 
         public IOrderLineCollection Lines => _orderLines;
 
-        public override OrderIdentity GetIdentity() => Identity;
+        public override OrderIdentifier GetIdentifier() => OrderIdentifier;
 
         private void OrderCustomerNameChangedEventHandler(HandlerEvent<OrderCustomerNameChanged> handlerEvent)
         {
@@ -53,7 +53,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 
         private void OrderLineRemovedEventHandler(HandlerEvent<OrderLineRemoved> handlerEvent)
         {
-            _orderLines.Remove(handlerEvent.Event.OrderLineIdentity);
+            _orderLines.Remove(handlerEvent.Event.OrderLineIdentifier);
         }
     }
 }

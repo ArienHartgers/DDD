@@ -2,18 +2,18 @@
 
 namespace DDD.Core
 {
-    public interface IEntityCollection<TEntity, TIdentity> : IEnumerable<TEntity>
-        where TIdentity : class
-        where TEntity : Entity<TIdentity>
+    public interface IEntityCollection<TEntity, TIdentifier> : IEnumerable<TEntity>
+        where TIdentifier : class
+        where TEntity : Entity<TIdentifier>
     {
         public IReadOnlyCollection<TEntity> Entities { get; }
 
-        public TIdentity? LastIdentity { get; }
+        public TIdentifier? LastIdentifier { get; }
 
-        public bool TryGet(TIdentity identity, out TEntity entity);
+        public bool TryGet(TIdentifier identifier, out TEntity entity);
 
-        public TEntity? Find(TIdentity identity);
+        public TEntity? Find(TIdentifier identifier);
 
-        public TEntity Get(TIdentity identity);
+        public TEntity Get(TIdentifier identifier);
     }
 }

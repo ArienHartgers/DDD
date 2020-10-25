@@ -8,14 +8,14 @@ namespace DDD.App.EventConverters
         public override Events.ProductCreated ConvertToExtern(Core.OrderManagement.Products.Events.ProductCreated e)
         {
             return new Events.ProductCreated(
-                e.ProductIdentity.Identity,
+                e.ProductIdentifier.Identifier,
                 e.ProductName.Name);
         }
 
         public override Core.OrderManagement.Products.Events.ProductCreated ConvertToIntern(Events.ProductCreated e)
         {
             return new Core.OrderManagement.Products.Events.ProductCreated(
-                ProductIdentity.Create(e.ProductIdentity),
+                ProductIdentifier.Create(e.ProductIdentifier),
                 ProductName.Create(e.ProductName));
         }
     }

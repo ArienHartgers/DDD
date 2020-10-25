@@ -1,4 +1,4 @@
-﻿using DDD.Core.OrderManagement.Orders.Identities;
+﻿using DDD.Core.OrderManagement.Orders.Identitfiers;
 
 namespace DDD.App.EventConverters
 {
@@ -7,14 +7,14 @@ namespace DDD.App.EventConverters
         public override Events.OrderCustomerNameChanged ConvertToExtern(Core.OrderManagement.Orders.Events.OrderCustomerNameChanged e)
         {
             return new Events.OrderCustomerNameChanged(
-                e.OrderIdentity.ToString(),
+                e.OrderIdentifier.ToString(),
                 e.CustomerName);
         }
 
         public override Core.OrderManagement.Orders.Events.OrderCustomerNameChanged ConvertToIntern(Events.OrderCustomerNameChanged e)
         {
             return new Core.OrderManagement.Orders.Events.OrderCustomerNameChanged(
-                OrderIdentity.Create(e.OrderIdentity),
+                OrderIdentifier.Create(e.OrderIdentifier),
                 e.CustomerName);
         }
     }

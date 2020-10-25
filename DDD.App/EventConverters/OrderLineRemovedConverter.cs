@@ -1,4 +1,4 @@
-﻿using DDD.Core.OrderManagement.Orders.Identities;
+﻿using DDD.Core.OrderManagement.Orders.Identitfiers;
 
 namespace DDD.App.EventConverters
 {
@@ -7,15 +7,15 @@ namespace DDD.App.EventConverters
         public override Events.OrderLineRemoved ConvertToExtern(Core.OrderManagement.Orders.Events.OrderLineRemoved e)
         {
             return new Events.OrderLineRemoved(
-                e.OrderIdentity.ToString(),
-                e.OrderLineIdentity.Identity);
+                e.OrderIdentifier.ToString(),
+                e.OrderLineIdentifier.Identifier);
         }
 
         public override Core.OrderManagement.Orders.Events.OrderLineRemoved ConvertToIntern(Events.OrderLineRemoved e)
         {
             return new Core.OrderManagement.Orders.Events.OrderLineRemoved(
-                OrderIdentity.Create(e.OrderIdentity),
-                OrderLineIdentity.Create(e.OrderLineIdentity));
+                OrderIdentifier.Create(e.OrderIdentifier),
+                OrderLineIdentifier.Create(e.OrderLineIdentifier));
         }
     }
 }

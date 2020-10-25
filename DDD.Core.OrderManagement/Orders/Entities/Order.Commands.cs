@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Linq;
 using DDD.Core.OrderManagement.Orders.Events;
-using DDD.Core.OrderManagement.Orders.Identities;
+using DDD.Core.OrderManagement.Orders.Identitfiers;
 using DDD.Core.OrderManagement.Products.Identities;
 
 namespace DDD.Core.OrderManagement.Orders.Entities
 {
     public partial class Order
     {
-        public static Order Create(DateTimeOffset now, OrderIdentity orderIdentity, CustomerIdentity customerIdentity)
+        public static Order Create(DateTimeOffset now, OrderIdentifier orderIdentifier, CustomerIdentifier customerIdentifier)
         {
             return CreateWithEvent<Order, OrderCreated>(
                 now,
                 new OrderCreated(
-                    orderIdentity,
-                    customerIdentity));
+                    orderIdentifier,
+                    customerIdentifier));
         }
 
         public void ChangeCustomerName(string customerName)
@@ -26,33 +26,33 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 
             if (CustomerName != customerName)
             {
-                ApplyChange(new OrderCustomerNameChanged(Identity, customerName));
+                ApplyChange(new OrderCustomerNameChanged(OrderIdentifier, customerName));
             }
         }
 
-        public OrderLine CreateOrderLine(ProductIdentity productIdentity, int quantity)
+        public OrderLine CreateOrderLine(ProductIdentifier productIdentifier, int quantity)
         {
-            var itemLine = Lines.FirstOrDefault(ol => ol.ProductIdentity == productIdentity);
+            var itemLine = Lines.FirstOrDefault(ol => ol.ProductIdentifier == productIdentifier);
             if (itemLine != null)
             {
                 ApplyChange(new OrderLineQuantityAdjusted(
-                    Identity,
-                    itemLine.Identity,
+                    OrderIdentifier,
+                    itemLine.Identifier,
                     itemLine.Quantity + quantity));
 
                 return itemLine;
             }
 
-            var identity = OrderLineIdentity.NextIdentity(Lines.LastIdentity);
+            var orderLineIdentifier = OrderLineIdentifier.NextIdentifier(Lines.LastIdentifier);
             
             ApplyChange(
                 new OrderLineCreated(
-                    Identity, 
-                    identity, 
-                    productIdentity, 
+                    OrderIdentifier, 
+                    orderLineIdentifier, 
+                    productIdentifier, 
                     quantity));
 
-            return Lines.Get(identity);
+            return Lines.Get(orderLineIdentifier);
         }
     }
 }

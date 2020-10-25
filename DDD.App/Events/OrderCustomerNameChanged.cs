@@ -2,9 +2,9 @@
 {
     public class OrderCustomerNameChanged : IDomainEvent
     {
-        public OrderCustomerNameChanged(string orderIdentity, string customerName)
+        public OrderCustomerNameChanged(string orderIdentifier, string customerName)
         {
-            OrderIdentity = orderIdentity;
+            OrderIdentifier = orderIdentifier;
             CustomerName = customerName;
         }
 
@@ -12,7 +12,7 @@
         {
         }
 
-        public string OrderIdentity { get; set; } = null!;
+        public string OrderIdentifier { get; set; } = null!;
 
         public string CustomerName { get; set; } = null!;
     }

@@ -11,14 +11,14 @@ namespace DDD.Core.OrderManagement.Products.Entities
         {
             return Product.CreateWithEvent<Product, ProductCreated>(
                 now,
-                new ProductCreated(ProductIdentity.New(), productName));
+                new ProductCreated(ProductIdentifier.New(), productName));
         }
 
         public void ChangeName(ProductName productName)
         {
             if (ProductName != productName)
             {
-                ApplyChange(new ProductNameChanged(Identity, productName));
+                ApplyChange(new ProductNameChanged(Identifier, productName));
             }
         }
     }

@@ -1,21 +1,21 @@
-﻿using DDD.Core.OrderManagement.Orders.Identities;
+﻿using DDD.Core.OrderManagement.Orders.Identitfiers;
 using DDD.Core.OrderManagement.Products.Identities;
 
 namespace DDD.Core.OrderManagement.Orders.Events
 {
     public class OrderLineCreated : Event
     {
-        public OrderLineCreated(OrderIdentity orderIdentity, OrderLineIdentity orderLineIdentity, ProductIdentity productIdentity, int quantity)
+        public OrderLineCreated(OrderIdentifier orderIdentifier, OrderLineIdentifier orderLineIdentifier, ProductIdentifier productIdentifier, int quantity)
         {
-            OrderIdentity = orderIdentity;
-            OrderLineIdentity = orderLineIdentity;
-            ProductIdentity = productIdentity;
+            OrderIdentifier = orderIdentifier;
+            OrderLineIdentifier = orderLineIdentifier;
+            ProductIdentifier = productIdentifier;
             Quantity = quantity;
         }
 
-        public OrderIdentity OrderIdentity { get; set; }
-        public OrderLineIdentity OrderLineIdentity { get; } 
-        public ProductIdentity ProductIdentity { get; }
+        public OrderIdentifier OrderIdentifier { get; set; }
+        public OrderLineIdentifier OrderLineIdentifier { get; } 
+        public ProductIdentifier ProductIdentifier { get; }
         public int Quantity { get;  }
     }
 }

@@ -1,16 +1,16 @@
-﻿using DDD.Core.OrderManagement.Orders.Identities;
+﻿using DDD.Core.OrderManagement.Orders.Identitfiers;
 
 namespace DDD.Core.OrderManagement.Orders.Events
 {
     public class OrderLineRemoved : Event
     {
-        public OrderLineRemoved(OrderIdentity orderIdentity, OrderLineIdentity orderLineIdentity)
+        public OrderLineRemoved(OrderIdentifier orderIdentifier, OrderLineIdentifier orderLineIdentifier)
         {
-            OrderIdentity = orderIdentity;
-            OrderLineIdentity = orderLineIdentity;
+            OrderIdentifier = orderIdentifier;
+            OrderLineIdentifier = orderLineIdentifier;
         }
 
-        public OrderIdentity OrderIdentity { get; set; }
-        public OrderLineIdentity OrderLineIdentity { get; }
+        public OrderIdentifier OrderIdentifier { get; set; }
+        public OrderLineIdentifier OrderLineIdentifier { get; }
     }
 }

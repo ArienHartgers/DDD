@@ -2,13 +2,13 @@
 {
     public class ProductNameChanged : IDomainEvent
     {
-        public ProductNameChanged(string productIdentity, string productName)
+        public ProductNameChanged(string productIdentifier, string productName)
         {
-            ProductIdentity = productIdentity;
+            ProductIdentifier = productIdentifier;
             ProductName = productName;
         }
 
-        public string ProductIdentity { get; }
+        public string ProductIdentifier { get; }
 
         public string ProductName { get; }
     }

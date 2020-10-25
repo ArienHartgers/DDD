@@ -5,7 +5,7 @@ using DDD.Core.OrderManagement.Products.ValueObjects;
 
 namespace DDD.Core.OrderManagement.Products
 {
-    public class ProductRepository : Repository<Product, ProductIdentity>
+    public class ProductRepository : Repository<Product, ProductIdentifier>
     {
         public ProductRepository(IEventStore eventStore) : base(eventStore)
         {
