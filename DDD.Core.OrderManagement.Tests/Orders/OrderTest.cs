@@ -1,8 +1,8 @@
 ﻿using System;
 using DDD.Core.OrderManagement.Orders.Entities;
 using DDD.Core.OrderManagement.Orders.Events;
-using DDD.Core.OrderManagement.Orders.Identitfiers;
-using DDD.Core.OrderManagement.Products.Identities;
+using DDD.Core.OrderManagement.Orders.Identifiers;
+using DDD.Core.OrderManagement.Products.Identitfiers;
 using DDD.Core.OrderManagement.Tests.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
@@ -131,10 +131,10 @@ namespace DDD.Core.OrderManagement.Tests.Orders
 
             Then<OrderLineCreated>(e =>
             {
-               e.OrderIdentifier.ShouldBe(Identifier);
-               e.OrderLineIdentifier.ShouldBe(OrderLineIdentifier.Create(1));
-               e.ProductIdentifier.ShouldBe(productIdentifier);
-               e.Quantity.ShouldBe(quantity);
+                e.OrderIdentifier.ShouldBe(Identifier);
+                e.OrderLineIdentifier.ShouldBe(OrderLineIdentifier.Create(1));
+                e.ProductIdentifier.ShouldBe(productIdentifier);
+                e.Quantity.ShouldBe(quantity);
             });
         }
 
@@ -153,7 +153,7 @@ namespace DDD.Core.OrderManagement.Tests.Orders
         }
 
         [TestMethod]
-        public void Tst012_AdjustOrderLine()
+        public void Tst021_AdjustOrderLine()
         {
             var orderLineIdentifier = OrderLineIdentifier.Create(1);
             var productIdentifier = ProductIdentifier.New();
@@ -173,5 +173,18 @@ namespace DDD.Core.OrderManagement.Tests.Orders
             });
         }
 
+        [TestMethod]
+        public void Tst022_AdjustOrderLine()
+        {
+            var orderLineIdentifier = OrderLineIdentifier.Create(1);
+            var quantity = 5;
+
+            Given(new OrderCreated(Identifier, _customerIdentifier));
+
+            var exception = Should.Throw<Exception>(() => When().AdjustOrderLine(orderLineIdentifier, quantity));
+            exception.Message.ShouldContain("not found");
+
+            ThenNothing();
+        }
     }
 }

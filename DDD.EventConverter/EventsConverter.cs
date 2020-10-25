@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using DDD.App.Events;
 using DDD.Core;
+using DDD.SharedKernel.Events;
 
-namespace DDD.App
+namespace DDD.EventConverter
 {
     public class EventsConverter
     {
@@ -14,7 +14,7 @@ namespace DDD.App
 
         public EventsConverter()
         {
-            var converterTypes = typeof(EventsConverter).Assembly.GetExportedTypes()
+            var converterTypes = GetType().Assembly.GetExportedTypes()
                 .Where(t => t.BaseType?.BaseType != null && t.BaseType.BaseType == typeof(EventConverter))
                 .ToList();
 

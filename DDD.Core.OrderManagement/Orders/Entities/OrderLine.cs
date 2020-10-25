@@ -1,6 +1,6 @@
 ﻿using DDD.Core.OrderManagement.Orders.Events;
-using DDD.Core.OrderManagement.Orders.Identitfiers;
-using DDD.Core.OrderManagement.Products.Identities;
+using DDD.Core.OrderManagement.Orders.Identifiers;
+using DDD.Core.OrderManagement.Products.Identitfiers;
 
 namespace DDD.Core.OrderManagement.Orders.Entities
 {

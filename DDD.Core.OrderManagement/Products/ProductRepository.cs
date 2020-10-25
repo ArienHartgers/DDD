@@ -1,5 +1,5 @@
 ﻿using DDD.Core.OrderManagement.Products.Entities;
-using DDD.Core.OrderManagement.Products.Identities;
+using DDD.Core.OrderManagement.Products.Identitfiers;
 
 namespace DDD.Core.OrderManagement.Products
 {

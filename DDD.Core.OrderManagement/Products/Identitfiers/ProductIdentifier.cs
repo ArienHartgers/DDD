@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DDD.Core.OrderManagement.Products.Identities
+namespace DDD.Core.OrderManagement.Products.Identitfiers
 {
     public class ProductIdentifier : IdentifierValueObject
     {

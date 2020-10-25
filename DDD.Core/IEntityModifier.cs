@@ -4,5 +4,6 @@
     {
         void ApplyChange(Event @event);
         void MarkAsRemoved();
+        string GetPath();
     }
 }

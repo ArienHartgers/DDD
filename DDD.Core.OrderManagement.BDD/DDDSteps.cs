@@ -5,8 +5,8 @@ using DDD.Core.OrderManagement.Orders;
 using TechTalk.SpecFlow;
 using DDD.Core.OrderManagement.Orders.Events;
 using DDD.Core.OrderManagement.Orders.Entities;
-using DDD.Core.OrderManagement.Orders.Identitfiers;
-using DDD.Core.OrderManagement.Products.Identities;
+using DDD.Core.OrderManagement.Orders.Identifiers;
+using DDD.Core.OrderManagement.Products.Identitfiers;
 using Shouldly;
 
 namespace DDD.Core.OrderManagement.BDD

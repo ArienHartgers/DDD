@@ -30,5 +30,15 @@ namespace DDD.Core
         {
             _root = null;
         }
+
+        protected string GetPath()
+        {
+            return $"{_root?.GetPath()}/{GetType().Name}/{GetIdentifier()}";
+        }
+
+        string IEntityModifier.GetPath()
+        {
+            return GetPath();
+        }
     }
 }

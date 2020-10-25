@@ -78,6 +78,16 @@ namespace DDD.Core
             return _context.GetDateTime();
         }
 
+        protected string GetPath()
+        {
+            return $"/{GetType().Name}/{GetIdentifier()}";
+        }
+
+        string IEntityModifier.GetPath()
+        {
+            return GetPath();
+        }
+
         void IEntityModifier.ApplyChange(Event @event)
         {
             ApplyChange(@event);

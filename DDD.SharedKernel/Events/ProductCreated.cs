@@ -1,8 +1,8 @@
-﻿namespace DDD.App.Events
+﻿namespace DDD.SharedKernel.Events
 {
-    public class ProductNameChanged : IDomainEvent
+    public class ProductCreated : IDomainEvent
     {
-        public ProductNameChanged(string productIdentifier, string productName)
+        public ProductCreated(string productIdentifier, string productName)
         {
             ProductIdentifier = productIdentifier;
             ProductName = productName;

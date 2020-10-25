@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DDD.Core.OrderManagement.Orders.Identitfiers
+namespace DDD.Core.OrderManagement.Orders.Identifiers
 {
     public class CustomerIdentifier : IdentifierValueObject
     {

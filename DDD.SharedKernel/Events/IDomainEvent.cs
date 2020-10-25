@@ -1,4 +1,4 @@
-﻿namespace DDD.App.Events
+﻿namespace DDD.SharedKernel.Events
 {
     public interface IDomainEvent
     {

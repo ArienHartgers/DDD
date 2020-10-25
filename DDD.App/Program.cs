@@ -1,13 +1,14 @@
 ﻿using System.Text.Json;
+using DDD.Adapters.Store;
 using DDD.Core;
-using DDD.Core.OrderManagement.BDD;
 using DDD.Core.OrderManagement.Orders;
 using DDD.Core.OrderManagement.Orders.Entities;
-using DDD.Core.OrderManagement.Orders.Identitfiers;
+using DDD.Core.OrderManagement.Orders.Identifiers;
 using DDD.Core.OrderManagement.Products;
 using DDD.Core.OrderManagement.Products.Entities;
-using DDD.Core.OrderManagement.Products.Identities;
+using DDD.Core.OrderManagement.Products.Identitfiers;
 using DDD.Core.OrderManagement.Products.ValueObjects;
+using DDD.EventConverter;
 
 namespace DDD.App
 {
@@ -33,9 +34,9 @@ namespace DDD.App
 
             //return;
 
-            var aggregateContext = new TestAggregateContext();
+            var aggregateContext = new AggregateContext();
 
-            IEventStore eventStore = new TestEventStore();
+            IEventStore eventStore = new EventStore();
             var productRepository = new ProductRepository(eventStore, aggregateContext);
 
             var product = Product.Create(aggregateContext, ProductName.Create("Brood"));

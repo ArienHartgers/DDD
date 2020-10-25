@@ -1,15 +1,17 @@
 ﻿using System;
 using DDD.Core.OrderManagement.Orders.Events;
-using DDD.Core.OrderManagement.Orders.Identitfiers;
+using DDD.Core.OrderManagement.Orders.Identifiers;
 
 namespace DDD.Core.OrderManagement.Orders.Entities
 {
     public partial class Order : AggregateRoot<OrderIdentifier>
     {
-        private readonly OrderLineCollection _orderLines = new OrderLineCollection();
+        private readonly OrderLineCollection _orderLines;
 
         private Order(TypedEvent<OrderCreated> initialEvent)
         {
+            _orderLines = new OrderLineCollection(this);
+
             Created = initialEvent.EventDateTime;
             LastUpdate = initialEvent.EventDateTime;
 

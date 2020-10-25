@@ -8,7 +8,13 @@ namespace DDD.Core
         where TIdentifier : class, IIdentifier
         where TEntity : Entity<TIdentifier>
     {
+        private readonly IEntityModifier _root;
         private readonly Dictionary<TIdentifier, TEntity> _entities = new Dictionary<TIdentifier, TEntity>();
+
+        public EntityCollection(IEntityModifier root)
+        {
+            _root = root;
+        }
 
         public IReadOnlyCollection<TEntity> Entities => _entities.Values;
 
@@ -53,7 +59,7 @@ namespace DDD.Core
                 return entity;
             }
 
-            throw new Exception($"Entity '{identifier}' not found");
+            throw new Exception($"{_root.GetPath()}/{typeof(TEntity).Name}/{identifier}' not found");
         }
 
         public Action<HandlerEvent<TEvent>> ForwardTo<TEvent>(Func<TEvent, TIdentifier> selector)

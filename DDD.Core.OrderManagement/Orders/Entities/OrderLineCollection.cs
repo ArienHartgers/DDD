@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using DDD.Core.OrderManagement.Orders.Identitfiers;
-using DDD.Core.OrderManagement.Products.Identities;
+using DDD.Core.OrderManagement.Orders.Identifiers;
+using DDD.Core.OrderManagement.Products.Identitfiers;
 
 namespace DDD.Core.OrderManagement.Orders.Entities
 {
@@ -12,6 +12,10 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 
     public class OrderLineCollection : EntityCollection<OrderLine, OrderLineIdentifier>, IOrderLineCollection
     {
+        public OrderLineCollection(IEntityModifier root) : base(root)
+        {
+        }
+
         public OrderLine Get(ProductIdentifier productIdentifier)
         {
             var orderLine = Entities.FirstOrDefault(ol => ol.ProductIdentifier == productIdentifier);

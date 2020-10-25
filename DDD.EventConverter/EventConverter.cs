@@ -1,8 +1,8 @@
 ﻿using System;
-using DDD.App.Events;
 using DDD.Core;
+using DDD.SharedKernel.Events;
 
-namespace DDD.App
+namespace DDD.EventConverter
 {
     public abstract class EventConverter
     {
