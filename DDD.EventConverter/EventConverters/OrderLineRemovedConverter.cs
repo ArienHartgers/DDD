@@ -15,8 +15,8 @@ namespace DDD.EventConverter.EventConverters
         public override Core.OrderManagement.Orders.Events.OrderLineRemoved ConvertToIntern(OrderLineRemoved e)
         {
             return new Core.OrderManagement.Orders.Events.OrderLineRemoved(
-                OrderIdentifier.Create(e.OrderIdentifier),
-                OrderLineIdentifier.Create(e.OrderLineIdentifier));
+                OrderIdentifier.Parse(e.OrderIdentifier),
+                OrderLineIdentifier.Parse(e.OrderLineIdentifier));
         }
     }
 }

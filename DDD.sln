@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DDD.EventConverter", "DDD.E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DDD.SharedKernel", "DDD.SharedKernel\DDD.SharedKernel.csproj", "{056CE879-A95D-4F5D-9783-C5CE504B483F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{1CC20819-EC98-4475-88E8-75FD476BC23A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,6 +62,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{74104014-8A64-4105-AF87-EFDF0895B431} = {1CC20819-EC98-4475-88E8-75FD476BC23A}
+		{824A2426-7B17-4C00-BD7F-A46C9150143A} = {1CC20819-EC98-4475-88E8-75FD476BC23A}
+		{30DEB821-5009-4DB1-A1B6-C52F1D05CA13} = {1CC20819-EC98-4475-88E8-75FD476BC23A}
+		{28DDDC83-2469-4853-A315-BEE73EBA44EA} = {1CC20819-EC98-4475-88E8-75FD476BC23A}
+		{056CE879-A95D-4F5D-9783-C5CE504B483F} = {1CC20819-EC98-4475-88E8-75FD476BC23A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E3A3ABD2-05A7-42FB-8ADF-50E3FF176F79}

@@ -16,8 +16,8 @@ namespace DDD.EventConverter.EventConverters
         public override Core.OrderManagement.Orders.Events.OrderLineQuantityAdjusted ConvertToIntern(OrderLineQuantityAdjusted e)
         {
             return new Core.OrderManagement.Orders.Events.OrderLineQuantityAdjusted(
-                OrderIdentifier.Create(e.OrderIdentifier),
-                OrderLineIdentifier.Create(e.OrderLineIdentifier),
+                OrderIdentifier.Parse(e.OrderIdentifier),
+                OrderLineIdentifier.Parse(e.OrderLineIdentifier),
                 e.Quantity);
         }
     }

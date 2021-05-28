@@ -1,19 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <LangVersion>8.0</LangVersion>
     <WarningsAsErrors>CS8600;CS8602;CS8603;CS8618;CS8625;</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Properties\**" />
+    <EmbeddedResource Remove="Properties\**" />
+    <None Remove="Properties\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\DDD.Core\DDD.Core.csproj" />
+    <ProjectReference Include="..\DDD.SharedKernel\DDD.SharedKernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Orders\ValueObjects\" />
-    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>

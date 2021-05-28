@@ -21,6 +21,11 @@ namespace DDD.Core.OrderManagement.Products.ValueObjects
             return new ProductName(name);
         }
 
+        public override string ToString()
+        {
+            return Name;
+        }
+
         protected override IEnumerable<object> GetEqualityComponents()
         {
             yield return Name;

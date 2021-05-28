@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DDD.Core
 {
@@ -37,7 +38,7 @@ namespace DDD.Core
             }
         }
 
-        public bool TryGet(TIdentifier identifier, out TEntity entity)
+        public bool TryGet(TIdentifier identifier, [MaybeNullWhen(false)]out TEntity entity)
         {
             return _entities.TryGetValue(identifier, out entity);
         }

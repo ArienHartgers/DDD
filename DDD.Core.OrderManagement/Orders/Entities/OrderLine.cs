@@ -1,6 +1,7 @@
 ﻿using DDD.Core.OrderManagement.Orders.Events;
 using DDD.Core.OrderManagement.Orders.Identifiers;
 using DDD.Core.OrderManagement.Products.Identitfiers;
+using DDD.Core.OrderManagement.Products.ValueObjects;
 
 namespace DDD.Core.OrderManagement.Orders.Entities
 {
@@ -14,6 +15,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
             _order = order;
             Identifier = initialEvent.Event.OrderLineIdentifier;
             ProductIdentifier = initialEvent.Event.ProductIdentifier;
+            ProductName = initialEvent.Event.ProductName;
             Quantity = initialEvent.Event.Quantity;
 
             RegisterEvent<OrderLineQuantityAdjusted>(ProcessOrderLineQuantityAdjusted);
@@ -21,6 +23,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 
         public OrderLineIdentifier Identifier { get; }
         public ProductIdentifier ProductIdentifier { get; }
+        public ProductName ProductName { get; }
         public int Quantity { get; private set; }
 
         public override OrderLineIdentifier GetIdentifier() => Identifier;

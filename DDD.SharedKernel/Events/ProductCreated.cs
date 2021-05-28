@@ -8,8 +8,14 @@
             ProductName = productName;
         }
 
-        public string ProductIdentifier { get; }
+        public ProductCreated()
+        {
+            ProductIdentifier = null!;
+            ProductName = null!;
+        }
 
-        public string ProductName { get; }
+        public string ProductIdentifier { get; set; }
+
+        public string ProductName { get; set; }
     }
 }

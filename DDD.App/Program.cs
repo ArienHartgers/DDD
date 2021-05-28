@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
+using System.Threading.Tasks;
 using DDD.Adapters.Store;
 using DDD.Core;
 using DDD.Core.OrderManagement.Orders;
@@ -14,7 +16,7 @@ namespace DDD.App
 {
     class Program
     {
-        static void Main()
+        static async Task Main()
         {
             var eventsConverter = new EventsConverter();
 
@@ -36,21 +38,21 @@ namespace DDD.App
 
             var aggregateContext = new AggregateContext();
 
-            IEventStore eventStore = new EventStore();
+            IEventStore eventStore = new EventStoreDb(eventsConverter, new Uri("http://localhost:2113"));
             var productRepository = new ProductRepository(eventStore, aggregateContext);
 
-            var product = Product.Create(aggregateContext, ProductName.Create("Brood"));
+            var product1 = Product.Create(aggregateContext, ProductName.Create("Brood"));
 
-            productRepository.Save(product);
+            await productRepository.SaveAsync(product1);
 
-            product.ChangeName(ProductName.Create("Boterham"));
-            productRepository.Save(product);
+            product1.ChangeName(ProductName.Create("Boterham"));
+            await productRepository.SaveAsync(product1);
 
 
 
             var productRepository2 = new ProductRepository(eventStore, aggregateContext);
             
-            var product2 = productRepository2.Get(product.Identifier);
+            var product1A = await productRepository2.GetAsync(product1.Identifier);
 
             //System.Console.WriteLine(JsonSerializer.Serialize(product, new JsonSerializerOptions { WriteIndented = true }));
             //System.Console.WriteLine(JsonSerializer.Serialize(product2, new JsonSerializerOptions { WriteIndented = true }));
@@ -64,73 +66,34 @@ namespace DDD.App
                 OrderIdentifier.New(), 
                 CustomerIdentifier.New());
 
-            var faultyLine = order.CreateOrderLine(ProductIdentifier.Parse("Fout"), 1);
+            var faultyLine = order.CreateOrderLine(ProductIdentifier.New(), 1);
             faultyLine.Remove();
-            
-            
-            order.CreateOrderLine(ProductIdentifier.Parse("Brood"), 1);
-            order.CreateOrderLine(ProductIdentifier.Parse("Boter"), 1);
-            order.CreateOrderLine(ProductIdentifier.Parse("Pindakaas"), 1);
-            order.CreateOrderLine(ProductIdentifier.Parse("Boterhamworst"), 1);
 
-            var pindaKaasOrderLine = order.Lines.Get(ProductIdentifier.Parse("Pindakaas"));
-            pindaKaasOrderLine.Remove();
-
-            var boterOrderLine = order.Lines.Get(ProductIdentifier.Parse("Boter"));
-            boterOrderLine.AdjustQuantity(3);
+            var prod2 = ProductIdentifier.New();
+            var prod3 = ProductIdentifier.New();
+            var prod4 = ProductIdentifier.New();
 
 
-            orderRepository.Save(order);
+            order.CreateOrderLine(product1, 1);
+            order.CreateOrderLine(prod2, 2);
+            order.CreateOrderLine(prod3, 1);
+            order.CreateOrderLine(prod4, 1);
 
-            var order2 = orderRepository.Get(order.OrderIdentifier);
+            var prod3OrderLine = order.Lines.Get(prod3);
+            prod3OrderLine.Remove();
 
-            var streamEvents = eventStore.GetStreamEvents(product.Identifier.Identifier);
-            foreach (var loadedEvent in streamEvents.Events)
-            {
-                if (loadedEvent.Data is Event @event)
-                {
-                    if (eventsConverter.TryConvert(@event, out var domainEvent))
-                    {
-                        System.Console.WriteLine($"{loadedEvent.EventDateTime} {domainEvent.GetType().Name}");
-                        System.Console.WriteLine(JsonSerializer.Serialize(domainEvent, domainEvent.GetType(), new JsonSerializerOptions { WriteIndented = true }));
-                        //System.Console.WriteLine(JsonSerializer.Serialize(@event, @event.GetType(), new JsonSerializerOptions { WriteIndented = true }));
-                    }
-                }
-            }
+            var prod1OrderLine = order.Lines.Get(product1.Identifier);
+            prod1OrderLine.AdjustQuantity(3);
 
 
-            order.ChangeCustomerName("Ilonka");
+            await orderRepository.SaveAsync(order);
+
+            var order2 = await orderRepository.GetAsync(order.OrderIdentifier);
 
 
-
-
-
-            var orderLine = order.CreateOrderLine(ProductIdentifier.Parse( "Brood"), 1);
-
-            //System.Console.WriteLine(JsonSerializer.Serialize(order, new JsonSerializerOptions { WriteIndented = true }));
-
-            orderRepository.Save(order);
-
-            var orderLine1 = order.Lines.Get(orderLine.Identifier);
-            orderLine1.AdjustQuantity(10);
-
-
-            //System.Console.WriteLine(JsonSerializer.Serialize(order, new JsonSerializerOptions { WriteIndented = true }));
-
-            orderRepository.Save(order);
-
-            var orderLine2 = order.Lines.Get(orderLine.Identifier);
-            orderLine2.AdjustQuantity(10);
-
-            orderRepository.Save(order);
-
-            var orderLine3 = order.Lines.Get(orderLine.Identifier);
-            orderLine3.Remove();
-
-            order.CreateOrderLine(ProductIdentifier.Parse("Brood2"), 1);
-
-            orderRepository.Save(order);
-            //System.Console.WriteLine(JsonSerializer.Serialize(order, new JsonSerializerOptions { WriteIndented = true }));
+            var product1B = await productRepository2.GetAsync(product1.Identifier);
+            product1B.ChangeName(ProductName.Create("Stok brood"));
+            await productRepository2.SaveAsync(product1B);
 
         }
     }

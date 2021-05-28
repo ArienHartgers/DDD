@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DDD.Core.OrderManagement.Tests.Helpers
 {
@@ -19,7 +20,7 @@ namespace DDD.Core.OrderManagement.Tests.Helpers
             loadedEvents.AddRange(changes);
         }
 
-        void IEventStore.SaveEvents(string streamName, int expectedVersion, IEnumerable<LoadedEvent> changes)
+        Task IEventStore.SaveEventsAsync(string streamName, int expectedVersion, IEnumerable<LoadedEvent> changes)
         {
             //Console.WriteLine($"=== Save ==={streamName}===");
             //Console.WriteLine(JsonSerializer.Serialize(changes, new JsonSerializerOptions { WriteIndented = true }));
@@ -37,16 +38,17 @@ namespace DDD.Core.OrderManagement.Tests.Helpers
             }
 
             loadedEvents.AddRange(changes);
+            return Task.CompletedTask;
         }
 
-        IEventStore.StreamEvents IEventStore.GetStreamEvents(string streamName)
+        Task<IEventStore.StreamEvents> IEventStore.GetStreamEventsAsync(string streamName)
         {
             if (_streams.TryGetValue(streamName, out var loadedEvents))
             {
-                return new IEventStore.StreamEvents(loadedEvents.Count, loadedEvents);
+                return Task.FromResult(new IEventStore.StreamEvents(loadedEvents.Count, loadedEvents));
             }
 
-            return _noEvents;
+            return Task.FromResult(_noEvents);
         }
     }
 }

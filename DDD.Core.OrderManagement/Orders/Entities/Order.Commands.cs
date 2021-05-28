@@ -4,6 +4,7 @@ using DDD.Core.OrderManagement.Orders.Events;
 using DDD.Core.OrderManagement.Orders.Identifiers;
 using DDD.Core.OrderManagement.Products.Entities;
 using DDD.Core.OrderManagement.Products.Identitfiers;
+using DDD.Core.OrderManagement.Products.ValueObjects;
 
 namespace DDD.Core.OrderManagement.Orders.Entities
 {
@@ -48,6 +49,27 @@ namespace DDD.Core.OrderManagement.Orders.Entities
                     OrderIdentifier, 
                     orderLineIdentifier, 
                     productIdentifier, 
+                    ProductName.Create("Unknown"), 
+                    quantity));
+
+            return Lines.Get(orderLineIdentifier);
+        }
+
+        public OrderLine CreateOrderLine(Product product, int quantity)
+        {
+            if (Lines.Any(ol => ol.ProductIdentifier == product.Identifier))
+            {
+                throw new InvalidOperationException($"An orderline with product {product.Identifier} already exists");
+            }
+
+            var orderLineIdentifier = OrderLineIdentifier.NextIdentifier(Lines.LastIdentifier);
+
+            ApplyChange(
+                new OrderLineCreated(
+                    OrderIdentifier,
+                    orderLineIdentifier,
+                    product.Identifier,
+                    product.ProductName,
                     quantity));
 
             return Lines.Get(orderLineIdentifier);

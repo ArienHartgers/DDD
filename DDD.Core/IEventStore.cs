@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DDD.Core
 {
     public interface IEventStore
     {
-        void SaveEvents(string streamName, int expectedVersion, IEnumerable<LoadedEvent> changes);
+        Task SaveEventsAsync(string streamName, int expectedVersion, IEnumerable<LoadedEvent> changes);
 
-        StreamEvents GetStreamEvents(string streamName);
+        Task<StreamEvents> GetStreamEventsAsync(string streamName);
 
         public class StreamEvents
         {

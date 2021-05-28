@@ -16,7 +16,7 @@ namespace DDD.EventConverter.EventConverters
         public override Core.OrderManagement.Products.Events.ProductCreated ConvertToIntern(ProductCreated e)
         {
             return new Core.OrderManagement.Products.Events.ProductCreated(
-                ProductIdentifier.Create(e.ProductIdentifier),
+                ProductIdentifier.Parse(e.ProductIdentifier),
                 ProductName.Create(e.ProductName));
         }
     }

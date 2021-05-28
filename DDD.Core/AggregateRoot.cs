@@ -46,6 +46,11 @@ namespace DDD.Core
             Version = version;
         }
 
+        public override string ToString()
+        {
+            return GetPath();
+        }
+
         internal void ApplyInitialEvent(LoadedEvent @event)
         {
             if (_changes.Any())
@@ -114,11 +119,13 @@ namespace DDD.Core
             var properties = GetType().GetProperties();
             foreach (var propertyInfo in properties)
             {
-                if (propertyInfo.CanWrite
+                if (propertyInfo != null && propertyInfo.SetMethod != null && propertyInfo.DeclaringType != null
+                    && propertyInfo.CanWrite
                     && !propertyInfo.SetMethod.IsPrivate
-                    && !(propertyInfo.DeclaringType?.Name.StartsWith("AggregateRoot") ?? false))
+                    && !propertyInfo.DeclaringType.Name.StartsWith("AggregateRoot"))
                 {
-                    throw new Exception($"Aggregate '{GetType().Name}' may only have readonly properties. Property '{propertyInfo.Name}' can be public written");
+                    throw new Exception(
+                        $"Aggregate '{GetType().Name}' may only have readonly properties. Property '{propertyInfo.Name}' can be public written");
                 }
             }
         }

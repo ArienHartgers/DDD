@@ -3,7 +3,7 @@
 namespace DDD.Core
 {
     public class HandlerEvent<TEvent>  : LoadedEvent
-        where TEvent : class
+        where TEvent : Event
     {
         public HandlerEvent(DateTimeOffset eventDateTime, TEvent data)
             : base(eventDateTime, data)

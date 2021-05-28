@@ -10,5 +10,9 @@ namespace DDD.Core.OrderManagement.Products
         {
         }
 
+        protected override string GetStreamName(IIdentifier identifier)
+        {
+            return $"product-{identifier}";
+        }
     }
 }

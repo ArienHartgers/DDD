@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace DDD.Core
 {
@@ -18,9 +19,9 @@ namespace DDD.Core
 
         public IAggregateContext AggregateContext { get; }
 
-        public TAggregateRoot Get(IIdentifier identifier)
+        public async Task<TAggregateRoot> GetAsync(IIdentifier identifier)
         {
-            var agg = Find(identifier);
+            var agg = await FindAsync(identifier);
             if (agg == null)
             {
                 throw new Exception($"{typeof(TAggregateRoot).Name} with identifier '{identifier}' not found");
@@ -29,9 +30,10 @@ namespace DDD.Core
             return agg;
         }
 
-        public TAggregateRoot? Find(IIdentifier identifier)
+        public async Task<TAggregateRoot?> FindAsync(IIdentifier identifier)
         {
-            var eventsResult = _eventStore.GetStreamEvents(identifier.Identifier);
+            var streamName = GetStreamName(identifier);
+            var eventsResult = await _eventStore.GetStreamEventsAsync(streamName);
 
             var firstLoadedEvent = eventsResult.Events.FirstOrDefault();
             if (firstLoadedEvent != null)
@@ -46,16 +48,21 @@ namespace DDD.Core
             return null;
         }
 
-        public void Save(TAggregateRoot aggregate)
+        public async Task SaveAsync(TAggregateRoot aggregate)
         {
             IAggregateLoader loader = aggregate;
             var changes = loader.GetUncommittedChanges();
             if (changes.Any())
             {
-                var streamName = aggregate.GetIdentifier().ToString();
-                _eventStore.SaveEvents(streamName, aggregate.Version, changes);
+                var streamName = GetStreamName(aggregate.GetIdentifier());
+                await _eventStore.SaveEventsAsync(streamName, aggregate.Version, changes);
                 loader.MarkChangesAsCommitted();
             }
+        }
+
+        protected virtual string GetStreamName(IIdentifier identifier)
+        {
+            return identifier.Identifier;
         }
 
         private TAggregateRoot CreateInternal(LoadedEvent firstLoadedEvent)

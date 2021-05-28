@@ -1,22 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using DDD.SharedKernel.Identifiers;
 
 namespace DDD.Core.OrderManagement.Orders.Identifiers
 {
     public class OrderLineIdentifier : IdentifierValueObject
     {
-        private OrderLineIdentifier(int id)
+        public static readonly Prefix Prefix = new Prefix("oln");
+
+        private OrderLineIdentifier(uint id)
         {
             LineId = id;
         }
 
-        public int LineId { get; }
+        public uint LineId { get; }
 
-        public override string Identifier => $"{LineId}";
+        public override string Identifier => LineId.ToSolidCode(Prefix);
 
-        public static OrderLineIdentifier Create(int lineId)
+        public static OrderLineIdentifier Create(uint lineId)
         {
-            if (lineId <= 0) throw new Exception("Invalid LineId");
             return new OrderLineIdentifier(lineId);
         }
 
@@ -26,9 +28,9 @@ namespace DDD.Core.OrderManagement.Orders.Identifiers
             return new OrderLineIdentifier( lastLineId+ 1);
         }
 
-        public static OrderLineIdentifier Create(string id)
+        public static OrderLineIdentifier Parse(string id)
         {
-            if (int.TryParse(id, out int value))
+            if (SolidCode.TryParseUInt(id, Prefix, out var value))
             {
                 return new OrderLineIdentifier(value);
             }

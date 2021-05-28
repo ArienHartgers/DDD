@@ -3,6 +3,7 @@ using DDD.Core.OrderManagement.Orders.Entities;
 using DDD.Core.OrderManagement.Orders.Events;
 using DDD.Core.OrderManagement.Orders.Identifiers;
 using DDD.Core.OrderManagement.Products.Identitfiers;
+using DDD.Core.OrderManagement.Products.ValueObjects;
 using DDD.Core.OrderManagement.Tests.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shouldly;
@@ -127,7 +128,8 @@ namespace DDD.Core.OrderManagement.Tests.Orders
 
             Given(new OrderCreated(Identifier, _customerIdentifier));
 
-            When().CreateOrderLine(productIdentifier, quantity);
+            var orderline = When().CreateOrderLine(productIdentifier, quantity);
+
 
             Then<OrderLineCreated>(e =>
             {
@@ -143,9 +145,10 @@ namespace DDD.Core.OrderManagement.Tests.Orders
         {
             var productIdentifier = ProductIdentifier.New();
             var quantity = 2;
+            var name = ProductName.Create("Test");
 
             Given(new OrderCreated(Identifier, _customerIdentifier));
-            Given(new OrderLineCreated(Identifier, OrderLineIdentifier.Create(1), productIdentifier, quantity));
+            Given(new OrderLineCreated(Identifier, OrderLineIdentifier.Create(1), productIdentifier, name, quantity));
 
             Should.Throw<InvalidOperationException>(() => When().CreateOrderLine(productIdentifier, quantity));
 
@@ -157,11 +160,12 @@ namespace DDD.Core.OrderManagement.Tests.Orders
         {
             var orderLineIdentifier = OrderLineIdentifier.Create(1);
             var productIdentifier = ProductIdentifier.New();
+            var name = ProductName.Create("Test");
             var oldQuantity = 2;
             var newQuantity = 5;
 
             Given(new OrderCreated(Identifier, _customerIdentifier));
-            Given(new OrderLineCreated(Identifier, orderLineIdentifier, productIdentifier, oldQuantity));
+            Given(new OrderLineCreated(Identifier, orderLineIdentifier, productIdentifier, name, oldQuantity));
 
             When().AdjustOrderLine(orderLineIdentifier, newQuantity);
 

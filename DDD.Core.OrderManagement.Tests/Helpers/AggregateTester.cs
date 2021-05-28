@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DDD.Core.OrderManagement.Tests.Helpers
 {
+    [DebuggerStepThrough]
     public class AggregateTester<TAggregate, TIdentifier> : IDisposable
-        where TIdentifier : IIdentifier
-        where TAggregate : AggregateRoot<TIdentifier>, IAggregateLoader
+    where TIdentifier : IIdentifier
+    where TAggregate : AggregateRoot<TIdentifier>, IAggregateLoader
     {
         private readonly TestEventStore _eventStore;
 
         private readonly Repository<TAggregate, TIdentifier> _repository;
-        private TAggregate _aggregate;
+        private TAggregate? _aggregate;
         private List<LoadedEvent>? _uncommittedChanges;
         private int _uncommitedCount;
 
@@ -53,7 +55,7 @@ namespace DDD.Core.OrderManagement.Tests.Helpers
             }
 
             _eventStore.AddTestEvents(
-                Identifier.ToString(),
+                Identifier.Identifier,
                 new LoadedEvent(
                     GivenDateTime,
                     @event));
@@ -81,7 +83,12 @@ namespace DDD.Core.OrderManagement.Tests.Helpers
             if (TestMode == Mode.Given)
             {
                 TestMode = Mode.When;
-                _aggregate = _repository.Get(Identifier);
+                _aggregate = _repository.GetAsync(Identifier).Result;
+            }
+
+            if (_aggregate == null)
+            {
+                throw new NullReferenceException("_aggregate cannot be null");
             }
 
             return _aggregate;
@@ -90,6 +97,11 @@ namespace DDD.Core.OrderManagement.Tests.Helpers
         public void ThenAggregate(Action<TAggregate> a)
         {
             PrepareThen();
+
+            if (_aggregate == null)
+            {
+                throw new NullReferenceException("_aggregate cannot be null");
+            }
 
             a(_aggregate);
         }
@@ -131,15 +143,19 @@ namespace DDD.Core.OrderManagement.Tests.Helpers
             {
                 Assert.Fail($"There is no event {_uncommitedCount} of type {typeof(TEvent).Name} available.");
             }
-
-            _uncommittedChanges.RemoveAt(0);
-
-            if (e.Data is TEvent @event)
+            else
             {
-                return @event;
+                _uncommittedChanges?.RemoveAt(0);
+
+                if (e.Data is TEvent @event)
+                {
+                    return @event;
+                }
+
+                Assert.Fail(
+                    $"Expect event {_uncommitedCount} of type {typeof(TEvent).Name}, but event of type {e.Data.GetType().Name} found.");
             }
 
-            Assert.Fail($"Expect event {_uncommitedCount} of type {typeof(TEvent).Name}, but event of type {e.Data.GetType().Name} found.");
             return null!;
         }
 
@@ -162,6 +178,11 @@ namespace DDD.Core.OrderManagement.Tests.Helpers
             if (TestMode == Mode.Given)
             {
                 throw new InvalidOperationException("TestMode error. Cannot execute Then() when TestMode is Given");
+            }
+
+            if (_aggregate == null)
+            {
+                throw new NullReferenceException("_aggregate cannot be null");
             }
 
             if (TestMode == Mode.When)

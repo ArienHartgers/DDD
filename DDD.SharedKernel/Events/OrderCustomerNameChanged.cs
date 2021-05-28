@@ -10,10 +10,12 @@
 
         public OrderCustomerNameChanged()
         {
+            OrderIdentifier = null!; ;
+            CustomerName = null!; ;
         }
 
-        public string OrderIdentifier { get; set; } = null!;
+        public string OrderIdentifier { get; set; }
 
-        public string CustomerName { get; set; } = null!;
+        public string CustomerName { get; set; }
     }
 }

@@ -8,7 +8,13 @@
             OrderLineIdentifier = orderLineIdentifier;
         }
 
-        public string OrderIdentifier { get; }
-        public string OrderLineIdentifier { get; }
+        public OrderLineRemoved()
+        {
+            OrderIdentifier = null!;
+            OrderLineIdentifier = null!;
+        }
+
+        public string OrderIdentifier { get; set; }
+        public string OrderLineIdentifier { get; set; }
     }
 }

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using DDD.Core;
 
 namespace DDD.Adapters.Store
 {
-    public class EventStore : IEventStore
+    public class InMemoryEventStore : IEventStore
     {
-        private readonly IEventStore.StreamEvents _noEvents = new IEventStore.StreamEvents(0, new List<LoadedEvent>(0));
+        private readonly Task<IEventStore.StreamEvents> _noEventsAsync = Task.FromResult(new IEventStore.StreamEvents(0, new List<LoadedEvent>(0)));
         private readonly Dictionary<string, List<LoadedEvent>> _streams = new Dictionary<string, List<LoadedEvent>>();
 
         public void AddTestEvents(string streamName, params LoadedEvent[] changes)
@@ -20,7 +21,7 @@ namespace DDD.Adapters.Store
             loadedEvents.AddRange(changes);
         }
 
-        void IEventStore.SaveEvents(string streamName, int expectedVersion, IEnumerable<LoadedEvent> changes)
+        Task IEventStore.SaveEventsAsync(string streamName, int expectedVersion, IEnumerable<LoadedEvent> changes)
         {
             //Console.WriteLine($"=== Save ==={streamName}===");
             //Console.WriteLine(JsonSerializer.Serialize(changes, new JsonSerializerOptions { WriteIndented = true }));
@@ -38,16 +39,18 @@ namespace DDD.Adapters.Store
             }
 
             loadedEvents.AddRange(changes);
+
+            return Task.CompletedTask;
         }
 
-        IEventStore.StreamEvents IEventStore.GetStreamEvents(string streamName)
+        Task<IEventStore.StreamEvents> IEventStore.GetStreamEventsAsync(string streamName)
         {
             if (_streams.TryGetValue(streamName, out var loadedEvents))
             {
-                return new IEventStore.StreamEvents(loadedEvents.Count, loadedEvents);
+                return Task.FromResult(new IEventStore.StreamEvents(loadedEvents.Count, loadedEvents));
             }
 
-            return _noEvents;
+            return _noEventsAsync;
         }
     }
 }

@@ -4,7 +4,7 @@ namespace DDD.Core
 {
     public class LoadedEvent
     {
-        public LoadedEvent(DateTimeOffset eventDateTime, object data)
+        public LoadedEvent(DateTimeOffset eventDateTime, Event data)
         {
             EventDateTime = eventDateTime;
             Data = data;
@@ -12,7 +12,7 @@ namespace DDD.Core
 
         public DateTimeOffset EventDateTime { get; }
 
-        public object Data { get; }
+        public Event Data { get; }
 
         public override string ToString()
         {

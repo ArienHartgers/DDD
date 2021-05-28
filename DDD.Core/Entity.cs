@@ -31,6 +31,11 @@ namespace DDD.Core
             _root = null;
         }
 
+        public override string ToString()
+        {
+            return GetPath();
+        }
+
         protected string GetPath()
         {
             return $"{_root?.GetPath()}/{GetType().Name}/{GetIdentifier()}";

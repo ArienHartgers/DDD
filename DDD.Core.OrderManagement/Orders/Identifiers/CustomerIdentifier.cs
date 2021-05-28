@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using DDD.SharedKernel.Identifiers;
 
 namespace DDD.Core.OrderManagement.Orders.Identifiers
 {
     public class CustomerIdentifier : IdentifierValueObject
     {
+        public static readonly Prefix Prefix = new Prefix("cus");
+
         internal CustomerIdentifier(Guid guid)
         {
             CustomerGuid = guid;
@@ -12,13 +15,13 @@ namespace DDD.Core.OrderManagement.Orders.Identifiers
 
         public Guid CustomerGuid { get; }
 
-        public override string Identifier => $"Customer_{CustomerGuid}";
+        public override string Identifier => CustomerGuid.ToSolidCode(Prefix);
 
-        public static CustomerIdentifier Create(string s)
+        public static CustomerIdentifier Parse(string s)
         {
-            if (s.StartsWith("Customer_"))
+            if (SolidCode.TryParseGuid(s, Prefix, out var guid))
             {
-                return new CustomerIdentifier(new Guid(s.Substring(6)));
+                return new CustomerIdentifier(guid);
             }
 
             throw new Exception("Invalid id");

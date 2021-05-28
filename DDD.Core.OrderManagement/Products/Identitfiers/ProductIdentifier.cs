@@ -1,35 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
+using DDD.SharedKernel.Identifiers;
 
 namespace DDD.Core.OrderManagement.Products.Identitfiers
 {
     public class ProductIdentifier : IdentifierValueObject
     {
-        internal ProductIdentifier(string value)
+        public static readonly Prefix Prefix = new Prefix("prd");
+
+        internal ProductIdentifier(Guid guid)
         {
-            Identifier = value;
+            ProductGuid = guid;
         }
 
-        public override string Identifier { get; }
+        public Guid ProductGuid { get; }
+
+        public override string Identifier => ProductGuid.ToSolidCode(Prefix);
 
         public static ProductIdentifier Parse(string s)
         {
-            //if (s.StartsWith("Product_"))
+            if (SolidCode.TryParseGuid(s, Prefix, out var guid))
             {
-                return new ProductIdentifier(s);// new Guid(s.Substring(6)));
+                return new ProductIdentifier(guid);
             }
 
             throw new Exception("Invalid id");
         }
 
-        public static ProductIdentifier Create(string orderGuid)
+        public static ProductIdentifier Create(Guid guid)
         {
-            return new ProductIdentifier(orderGuid);
+            return new ProductIdentifier(guid);
         }
 
         public static ProductIdentifier New()
         {
-            return new ProductIdentifier(Guid.NewGuid().ToString());
+            return new ProductIdentifier(Guid.NewGuid());
         }
 
         protected override IEnumerable<object> GetEqualityComponents()

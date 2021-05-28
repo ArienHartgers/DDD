@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace DDD.Core
 {
@@ -10,7 +11,7 @@ namespace DDD.Core
 
         public TIdentifier? LastIdentifier { get; }
 
-        public bool TryGet(TIdentifier identifier, out TEntity entity);
+        public bool TryGet(TIdentifier identifier, [MaybeNullWhen(false)] out TEntity entity);
 
         public TEntity? Find(TIdentifier identifier);
 

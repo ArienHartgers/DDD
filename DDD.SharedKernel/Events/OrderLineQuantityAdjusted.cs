@@ -9,6 +9,12 @@
             Quantity = quantity;
         }
 
+        public OrderLineQuantityAdjusted()
+        {
+            OrderIdentifier = null!;
+            OrderLineIdentifier = null!;
+        }
+
         public string OrderIdentifier { get; set; }
         public string OrderLineIdentifier { get; set; }
         public int Quantity { get; set; }

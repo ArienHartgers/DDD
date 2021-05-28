@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DDD.Core.OrderManagement.Orders;
 using TechTalk.SpecFlow;
 using DDD.Core.OrderManagement.Orders.Events;
 using DDD.Core.OrderManagement.Orders.Entities;
 using DDD.Core.OrderManagement.Orders.Identifiers;
 using DDD.Core.OrderManagement.Products.Identitfiers;
+using DDD.Core.OrderManagement.Products.ValueObjects;
 using Shouldly;
 
 namespace DDD.Core.OrderManagement.BDD
@@ -47,6 +49,7 @@ namespace DDD.Core.OrderManagement.BDD
                 _orderIdentifier,
                 OrderLineIdentifier.Create(1),
                 ProductIdentifier.Parse(product),
+                ProductName.Create("Test"), 
                 quantity));
         }
 
@@ -66,7 +69,7 @@ namespace DDD.Core.OrderManagement.BDD
         [When(@"I change quantity to (.*) from orderline with id (.*)")]
         public void WhenIChangeQuantityToFromOrderlineWithId(int quantity, string id)
         {
-            var orderLineIdentity = OrderLineIdentifier.Create(id);
+            var orderLineIdentity = OrderLineIdentifier.Parse(id);
             var order = GetOrder();
             var orderLine = order.Lines.Get(orderLineIdentity);
             orderLine.AdjustQuantity(quantity);
@@ -76,7 +79,7 @@ namespace DDD.Core.OrderManagement.BDD
         public void WhenIRemoveLineWithIdentityFromOrder(string id)
         {
             var order = GetOrder();
-            var orderLine = order.Lines.Get(OrderLineIdentifier.Create(id));
+            var orderLine = order.Lines.Get(OrderLineIdentifier.Parse(id));
             orderLine.Remove();
         }
 
@@ -104,7 +107,7 @@ namespace DDD.Core.OrderManagement.BDD
         }
 
         [Then(@"itemline (.*) is removed")]
-        public void ThenItemlineIsRemoved(int id)
+        public void ThenItemlineIsRemoved(uint id)
         {
             var orderLineCreatedEvent = ThenGetEvent<OrderLineRemoved>();
             orderLineCreatedEvent.ShouldNotBeNull();
@@ -112,7 +115,7 @@ namespace DDD.Core.OrderManagement.BDD
         }
 
         [Then(@"itemline (.*) quantity is changed to (.*)")]
-        public void ThenItemlineQuantityIsChangedTo(int id, int quantity)
+        public void ThenItemlineQuantityIsChangedTo(uint id, int quantity)
         {
             var orderLineQuantityAdjustedEvent = ThenGetEvent<OrderLineQuantityAdjusted>();
             orderLineQuantityAdjustedEvent.ShouldNotBeNull();
@@ -193,7 +196,7 @@ namespace DDD.Core.OrderManagement.BDD
                 }
 
                 var orderRepository = new OrderRepository(_eventStore, _aggregateContext);
-                _order = orderRepository.Get(_orderIdentifier);
+                _order = orderRepository.GetAsync(_orderIdentifier).Result;
                 _eventStore = null;
             }
 

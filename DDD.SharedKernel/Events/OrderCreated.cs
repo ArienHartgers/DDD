@@ -8,7 +8,13 @@
             CustomerIdentifier = customerIdentifier;
         }
 
+        public OrderCreated()
+        {
+            OrderIdentifier = null!;
+            CustomerIdentifier = null!;
+        }
+
         public string OrderIdentifier { get; set; }
-        public string CustomerIdentifier { get; }
+        public string CustomerIdentifier { get; set; }
     }
 }

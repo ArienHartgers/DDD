@@ -9,5 +9,11 @@ namespace DDD.Core.OrderManagement.Orders
             : base(eventStore, context)
         {
         }
+
+        protected override string GetStreamName(IIdentifier identifier)
+        {
+            return $"order-{identifier}";
+        }
+
     }
 }

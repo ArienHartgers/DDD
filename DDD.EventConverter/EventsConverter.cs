@@ -7,7 +7,7 @@ using DDD.SharedKernel.Events;
 
 namespace DDD.EventConverter
 {
-    public class EventsConverter
+    public class EventsConverter : IEventsConverter
     {
         private readonly Dictionary<Type, EventConverter> _externalConverters;
         private readonly Dictionary<Type, EventConverter> _internalConverters;
@@ -31,7 +31,7 @@ namespace DDD.EventConverter
         {
             if (_internalConverters.TryGetValue(@event.GetType(), out var converter))
             {
-                domainEvent= converter.Convert(@event);
+                domainEvent = converter.Convert(@event);
                 return true;
             }
 
