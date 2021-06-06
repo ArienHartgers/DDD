@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace DDD.Core
 {
@@ -135,34 +134,11 @@ namespace DDD.Core
             where TEvent : Event
         {
             var now = context.GetDateTime();
-            var aggregateRoot = CallAggregateConstructor<TAggregateRoot, TEvent>(new TypedEvent<TEvent>(now, firstEvent));
+            var aggregateRoot = AggregateFactory.CreateAggregateRoot<TAggregateRoot, TIdentifier>(new TypedEvent<TEvent>(now, firstEvent), firstEvent);
             aggregateRoot._context = context;
 
             aggregateRoot.ApplyInitialEvent(new LoadedEvent(now, firstEvent));
             return aggregateRoot;
         }
-
-        private static TAggregateRoot CallAggregateConstructor<TAggregateRoot, TEvent>(TypedEvent<TEvent> typedEvent)
-            where TAggregateRoot : AggregateRoot<TIdentifier>
-            where TEvent : Event
-        {
-            var constructors = typeof(TAggregateRoot).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            if (constructors.Length == 1)
-            {
-                var constructor = constructors[0];
-                if (constructor.IsPrivate)
-                {
-
-                    var paramTypes = constructor.GetParameters();
-                    if (paramTypes.Length == 1 && paramTypes[0].ParameterType == typedEvent.GetType())
-                    {
-                        return (TAggregateRoot)constructor.Invoke(new object[] { typedEvent });
-                    }
-                }
-            }
-
-            throw new Exception($"Aggregate {typeof(TAggregateRoot).Name} must have 1 private constructor(TypedEvent<{typeof(TEvent).Name}> initialEvent)");
-        }
-
     }
 }

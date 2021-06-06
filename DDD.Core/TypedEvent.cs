@@ -2,7 +2,7 @@
 
 namespace DDD.Core
 {
-    public class TypedEvent<TEvent>
+    public class TypedEvent<TEvent> : IEventContext
         where TEvent: Event
     {
         public TypedEvent(DateTimeOffset eventDateTime, TEvent @event)

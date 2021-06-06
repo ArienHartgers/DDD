@@ -38,7 +38,7 @@ namespace DDD.Core
             var firstLoadedEvent = eventsResult.Events.FirstOrDefault();
             if (firstLoadedEvent != null)
             {
-                TAggregateRoot aggregate = CreateInternal(firstLoadedEvent);
+                TAggregateRoot aggregate = AggregateFactory.CreateAggregateRoot<TAggregateRoot, TIdentifier>(firstLoadedEvent, firstLoadedEvent.Data);
                 IAggregateLoader loader = aggregate;
                 loader.SetAggregateContext(AggregateContext);
                 loader.LoadFromHistory(eventsResult.Version, eventsResult.Events.Skip(1));
@@ -64,30 +64,5 @@ namespace DDD.Core
         {
             return identifier.Identifier;
         }
-
-        private TAggregateRoot CreateInternal(LoadedEvent firstLoadedEvent)
-        {
-            var eventType = firstLoadedEvent.Data.GetType();
-            var typedEventType = typeof(TypedEvent<>).MakeGenericType(eventType);
-            var typedEvent = typedEventType.GetConstructors().First().Invoke(new object[] { firstLoadedEvent.EventDateTime, firstLoadedEvent.Data });
-
-            var constructors = typeof(TAggregateRoot).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-            if (constructors.Length == 1)
-            {
-                var constructor = constructors[0];
-                if (constructor.IsPrivate)
-                {
-
-                    var paramTypes = constructor.GetParameters();
-                    if (paramTypes.Length == 1 && paramTypes[0].ParameterType == typedEventType)
-                    {
-                        return (TAggregateRoot)constructor.Invoke(new object[] { typedEvent });
-                    }
-                }
-            }
-
-            throw new Exception($"Aggregate {typeof(TAggregateRoot).Name} must have 1 private constructor(TypedEvent<{eventType.Name}> initialEvent)");
-        }
-
     }
 }

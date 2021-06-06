@@ -2,7 +2,7 @@
 
 namespace DDD.Core
 {
-    public class LoadedEvent
+    public class LoadedEvent : IEventContext
     {
         public LoadedEvent(DateTimeOffset eventDateTime, Event data)
         {

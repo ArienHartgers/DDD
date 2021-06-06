@@ -8,16 +8,16 @@ namespace DDD.Core.OrderManagement.Orders.Entities
     {
         private readonly OrderLineCollection _orderLines;
 
-        private Order(TypedEvent<OrderCreated> initialEvent)
+        private Order(IEventContext context, OrderCreated initialEvent)
         {
             _orderLines = new OrderLineCollection(this);
 
-            Created = initialEvent.EventDateTime;
-            LastUpdate = initialEvent.EventDateTime;
+            Created = context.EventDateTime;
+            LastUpdate = context.EventDateTime;
 
-            OrderIdentifier = initialEvent.Event.OrderIdentifier;
-            CustomerIdentifier = initialEvent.Event.CustomerIdentifier;
-            CustomerName = initialEvent.Event.CustomerIdentifier.ToString();
+            OrderIdentifier = initialEvent.OrderIdentifier;
+            CustomerIdentifier = initialEvent.CustomerIdentifier;
+            CustomerName = initialEvent.CustomerIdentifier.ToString();
 
             RegisterEvent<OrderCustomerNameChanged>(OrderCustomerNameChangedEventHandler);
 
