@@ -5,7 +5,7 @@ using DDD.Core.OrderManagement.Products.ValueObjects;
 
 namespace DDD.Core.OrderManagement.Orders.Entities
 {
-    public partial class OrderLine : Entity<OrderLineIdentifier>
+    public partial class OrderLine : Entity
     {
         private readonly Order _order;
 
@@ -26,7 +26,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
         public ProductName ProductName { get; }
         public int Quantity { get; private set; }
 
-        public override OrderLineIdentifier GetIdentifier() => Identifier;
+        public override IIdentifier GetIdentifier() => Identifier;
 
         private void ProcessOrderLineQuantityAdjusted(HandlerEvent<OrderLineQuantityAdjusted> handlerEvent)
         {

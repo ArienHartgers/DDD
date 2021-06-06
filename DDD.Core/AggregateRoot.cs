@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace DDD.Core
 {
-    public abstract class AggregateRoot<TIdentifier> : EntityBase<TIdentifier>, IAggregateLoader, IEntityModifier
+    public abstract class AggregateRoot : EntityBase, IAggregateLoader, IEntityModifier
     {
         private static bool _isChecked = false;
         private readonly List<LoadedEvent> _changes = new List<LoadedEvent>();
@@ -130,11 +130,11 @@ namespace DDD.Core
         }
 
         protected static TAggregateRoot CreateWithEvent<TAggregateRoot, TEvent>(IAggregateContext context, TEvent firstEvent)
-            where TAggregateRoot : AggregateRoot<TIdentifier>
+            where TAggregateRoot : AggregateRoot
             where TEvent : Event
         {
             var now = context.GetDateTime();
-            var aggregateRoot = AggregateFactory.CreateAggregateRoot<TAggregateRoot, TIdentifier>(new TypedEvent<TEvent>(now, firstEvent), firstEvent);
+            var aggregateRoot = AggregateFactory.CreateAggregateRoot<TAggregateRoot>(new TypedEvent<TEvent>(now, firstEvent), firstEvent);
             aggregateRoot._context = context;
 
             aggregateRoot.ApplyInitialEvent(new LoadedEvent(now, firstEvent));

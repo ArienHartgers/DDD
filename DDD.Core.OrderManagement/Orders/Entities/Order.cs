@@ -4,7 +4,7 @@ using DDD.Core.OrderManagement.Orders.Identifiers;
 
 namespace DDD.Core.OrderManagement.Orders.Entities
 {
-    public partial class Order : AggregateRoot<OrderIdentifier>
+    public partial class Order : AggregateRoot
     {
         private readonly OrderLineCollection _orderLines;
 
@@ -39,7 +39,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
 
         public IOrderLineCollection Lines => _orderLines;
 
-        public override OrderIdentifier GetIdentifier() => OrderIdentifier;
+        public override IIdentifier GetIdentifier() => OrderIdentifier;
 
         private void OrderCustomerNameChangedEventHandler(HandlerEvent<OrderCustomerNameChanged> handlerEvent)
         {
@@ -50,7 +50,7 @@ namespace DDD.Core.OrderManagement.Orders.Entities
         private void OrderLineCreatedEventHandler(HandlerEvent<OrderLineCreated> handlerEvent)
         {
             var orderLine = new OrderLine(this, handlerEvent);
-            _orderLines.Add(orderLine);
+            _orderLines.Add(orderLine.Identifier, orderLine);
         }
 
         private void OrderLineRemovedEventHandler(HandlerEvent<OrderLineRemoved> handlerEvent)

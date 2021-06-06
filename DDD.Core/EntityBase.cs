@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace DDD.Core
 {
-    public abstract class EntityBase<TIdentifier> : IEventApplier
+    public abstract class EntityBase : IEventApplier
     {
 
         private readonly Dictionary<Type, MessageHandler>
             _messageHandlerDictionary = new Dictionary<Type, MessageHandler>();
 
-        public abstract TIdentifier GetIdentifier();
+        public abstract IIdentifier GetIdentifier();
 
         bool IEventApplier.ProcessMessage(LoadedEvent loadedEvent)
         {

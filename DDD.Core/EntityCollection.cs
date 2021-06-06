@@ -7,7 +7,7 @@ namespace DDD.Core
 {
     public class EntityCollection<TEntity, TIdentifier> : IEntityCollection<TEntity, TIdentifier>
         where TIdentifier : class, IIdentifier
-        where TEntity : Entity<TIdentifier>
+        where TEntity : Entity
     {
         private readonly IEntityModifier _root;
         private readonly Dictionary<TIdentifier, TEntity> _entities = new Dictionary<TIdentifier, TEntity>();
@@ -21,11 +21,11 @@ namespace DDD.Core
 
         public TIdentifier? LastIdentifier { get; private set; }
 
-        public void Add(TEntity entity)
+        public void Add(TIdentifier identifier, TEntity entity)
         {
-            _entities.Add(entity.GetIdentifier(), entity);
+            _entities.Add(identifier, entity);
 
-            LastIdentifier = entity.GetIdentifier();
+            LastIdentifier = identifier;
         }
 
         public void Remove(TIdentifier identifier)

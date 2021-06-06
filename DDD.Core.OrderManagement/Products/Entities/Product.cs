@@ -5,7 +5,7 @@ using DDD.Core.OrderManagement.Products.ValueObjects;
 
 namespace DDD.Core.OrderManagement.Products.Entities
 {
-    public partial class Product : AggregateRoot<ProductIdentifier>
+    public partial class Product : AggregateRoot
     {
         private Product(TypedEvent<ProductCreated> initialEvent)
         {
@@ -25,7 +25,7 @@ namespace DDD.Core.OrderManagement.Products.Entities
 
         public ProductName ProductName { get; private set; }
 
-        public override ProductIdentifier GetIdentifier() => Identifier;
+        public override IIdentifier GetIdentifier() => Identifier;
 
 
         private void ProductNameChangedEventHandler(HandlerEvent<ProductNameChanged> handlerEvent)

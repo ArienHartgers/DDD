@@ -9,7 +9,7 @@ namespace DDD.Core.OrderManagement.Tests.Helpers
     [DebuggerStepThrough]
     public class AggregateTester<TAggregate, TIdentifier> : IDisposable
     where TIdentifier : IIdentifier
-    where TAggregate : AggregateRoot<TIdentifier>, IAggregateLoader
+    where TAggregate : AggregateRoot, IAggregateLoader
     {
         private readonly TestEventStore _eventStore;
 
@@ -34,7 +34,7 @@ namespace DDD.Core.OrderManagement.Tests.Helpers
             WhenDateTime = new DateTimeOffset(2000, 2, 20, 8, 0, 0, TimeSpan.FromHours(2));
 
             AggregateContext = new TestAggregateContext(this);
-            _repository = new Repository<TAggregate, TIdentifier>(_eventStore, AggregateContext);
+            _repository = new TestRepository<TAggregate, TIdentifier>(_eventStore, AggregateContext);
         }
 
         public Mode TestMode { get; private set; }

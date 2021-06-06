@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace DDD.Core
 {
-    public class Repository<TAggregateRoot, TIdentifier>
+    public abstract class Repository<TAggregateRoot, TIdentifier>
         where TIdentifier : IIdentifier
-        where TAggregateRoot : AggregateRoot<TIdentifier>, IAggregateLoader
+        where TAggregateRoot : AggregateRoot, IAggregateLoader
     {
         private readonly IEventStore _eventStore;
 
@@ -19,7 +18,7 @@ namespace DDD.Core
 
         public IAggregateContext AggregateContext { get; }
 
-        public async Task<TAggregateRoot> GetAsync(IIdentifier identifier)
+        public async Task<TAggregateRoot> GetAsync(TIdentifier identifier)
         {
             var agg = await FindAsync(identifier);
             if (agg == null)
@@ -30,7 +29,7 @@ namespace DDD.Core
             return agg;
         }
 
-        public async Task<TAggregateRoot?> FindAsync(IIdentifier identifier)
+        public async Task<TAggregateRoot?> FindAsync(TIdentifier identifier)
         {
             var streamName = GetStreamName(identifier);
             var eventsResult = await _eventStore.GetStreamEventsAsync(streamName);
@@ -38,7 +37,7 @@ namespace DDD.Core
             var firstLoadedEvent = eventsResult.Events.FirstOrDefault();
             if (firstLoadedEvent != null)
             {
-                TAggregateRoot aggregate = AggregateFactory.CreateAggregateRoot<TAggregateRoot, TIdentifier>(firstLoadedEvent, firstLoadedEvent.Data);
+                TAggregateRoot aggregate = AggregateFactory.CreateAggregateRoot<TAggregateRoot>(firstLoadedEvent, firstLoadedEvent.Data);
                 IAggregateLoader loader = aggregate;
                 loader.SetAggregateContext(AggregateContext);
                 loader.LoadFromHistory(eventsResult.Version, eventsResult.Events.Skip(1));
@@ -54,15 +53,13 @@ namespace DDD.Core
             var changes = loader.GetUncommittedChanges();
             if (changes.Any())
             {
-                var streamName = GetStreamName(aggregate.GetIdentifier());
+                var identifier = aggregate.GetIdentifier();
+                var streamName = GetStreamName(identifier);
                 await _eventStore.SaveEventsAsync(streamName, aggregate.Version, changes);
                 loader.MarkChangesAsCommitted();
             }
         }
 
-        protected virtual string GetStreamName(IIdentifier identifier)
-        {
-            return identifier.Identifier;
-        }
+        protected abstract string GetStreamName(IIdentifier identifier);
     }
 }

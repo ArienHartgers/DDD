@@ -5,8 +5,8 @@ namespace DDD.Core
 {
     public static class AggregateFactory
     {
-        internal static TAggregateRoot CreateAggregateRoot<TAggregateRoot, TIdentifier>(IEventContext context, Event initialEvent)
-            where TAggregateRoot : AggregateRoot<TIdentifier>
+        internal static TAggregateRoot CreateAggregateRoot<TAggregateRoot>(IEventContext context, Event initialEvent)
+            where TAggregateRoot : AggregateRoot
         {
             var eventType = initialEvent.GetType();
             var constructors = typeof(TAggregateRoot).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);

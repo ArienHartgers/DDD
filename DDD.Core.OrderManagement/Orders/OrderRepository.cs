@@ -12,8 +12,7 @@ namespace DDD.Core.OrderManagement.Orders
 
         protected override string GetStreamName(IIdentifier identifier)
         {
-            return $"order-{identifier}";
+            return $"order-{identifier.Identifier}";
         }
-
     }
 }

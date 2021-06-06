@@ -5,7 +5,7 @@ namespace DDD.Core
 {
     public interface IEntityCollection<TEntity, TIdentifier> : IEnumerable<TEntity>
         where TIdentifier : class
-        where TEntity : Entity<TIdentifier>
+        where TEntity : Entity
     {
         public IReadOnlyCollection<TEntity> Entities { get; }
 
