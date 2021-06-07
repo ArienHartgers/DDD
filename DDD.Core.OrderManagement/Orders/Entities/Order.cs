@@ -27,6 +27,26 @@ namespace DDD.Core.OrderManagement.Orders.Entities
             RegisterEvent<OrderLineQuantityAdjusted>(e => e.ForwardTo(_orderLines.Get(e.Event.OrderLineIdentifier)));
         }
 
+        private Order(IEventContext context, OrderCustomerNameChanged initialEvent)
+        {
+            _orderLines = new OrderLineCollection(this);
+
+            Created = context.EventDateTime;
+            LastUpdate = context.EventDateTime;
+
+            OrderIdentifier = initialEvent.OrderIdentifier;
+            CustomerIdentifier = CustomerIdentifier.New();
+            CustomerName = initialEvent.CustomerName;
+
+            RegisterEvent<OrderCustomerNameChanged>(OrderCustomerNameChangedEventHandler);
+
+            // OrderLines
+            RegisterEvent<OrderLineCreated>(OrderLineCreatedEventHandler);
+            RegisterEvent<OrderLineRemoved>(OrderLineRemovedEventHandler);
+            RegisterEvent<OrderLineQuantityAdjusted>(e => e.ForwardTo(_orderLines.Get(e.Event.OrderLineIdentifier)));
+        }
+
+
         public OrderIdentifier OrderIdentifier { get; }
     
         public DateTimeOffset Created { get; private set; }
